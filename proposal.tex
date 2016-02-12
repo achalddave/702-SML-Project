@@ -35,9 +35,8 @@ Jingyan Wang* \\
 
 \maketitle
 
-\section{Introduction}
-
-The growth of the internet and electronic databases in general has led to an
+\section{Project Description}
+The growth of the Internet and electronic databases in general has led to an
 increasing concern about the privacy of users' information. These databases
 enable researchers and corporations alike to learn information, such as
 identifying new trends or learning to recommend movies, from large
@@ -46,20 +45,19 @@ of users' privacy: the more questions we ask about a large dataset of users'
 information, the more information we receive about each individual user's
 information. Prior work, including \cite{narayanan2008robust,
 sweeney1997weaving, ganta2008composition}, has shown that even anonymous
-datasets can reveal sensitive details about individuals. Differential privacy
-aims to provide provable privacy for users with high probability, while allowing
-queries that reveal details about the dataset as a whole.
+datasets can reveal sensitive details about individuals.
+
+Differential privacy aims to provide provable privacy for users with high probability, while allowing queries that reveal details about the dataset as a whole. Combining differential privacy and machine learning methods have been giving rise to new algorithms and new theoretical guarantees.
+
+In the project, we will learn the fundamental concepts about differential privacy, understand differentially-private algorithms and their guarantees, and trade-offs that are imposed by the differential privacy property.
 
 \section{Reading List}
-
-We plan on reading and reviewing the following
+We plan on reading the following papers:
 \begin{enumerate}
-\item One example of the need for differential privacy. \cite{narayanan2008robust}
+\item Some broad motivation for the need for differential privacy. \cite{narayanan2008robust}
+\item Fundamentals of differential privacy from excerpts of a book. \cite{dwork2014algorithmic}
 \item A survey of differential privacy results. \cite{dwork2008differential}
-\item An application of differential privacy in empirical risk minimization.
-\cite{chaudhuri2011differentially}
-\item Excerpts from a book on the fundamentals of differential privacy
-\cite{dwork2014algorithmic}
+\item Applications of differential privacy in empirical risk minimization, which include logistic regression and SVM.~\cite{chaudhuri2011differentially} If time permits, papers from recent conferences.
 \end{enumerate}
 
 {\small
