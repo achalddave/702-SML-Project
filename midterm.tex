@@ -1,0 +1,79 @@
+\documentclass{article} % For LaTeX2e
+\usepackage{nips15submit_e,times}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage[inline]{enumitem}
+%\documentstyle[nips14submit_09,times,art10]{article} % For LaTeX 2.09
+
+
+\title{A Survey on Differential Privacy}
+
+\author{
+Achal Dave* \\
+\texttt{achald@cs.cmu.edu} \\
+\And
+Jingyan Wang* \\
+\texttt{jingyanw@cs.cmu.edu} \\
+\\
+}
+
+% The \author macro works with any number of authors. There are two commands
+% used to separate the names and addresses of multiple authors: \And and \AND.
+%
+% Using \And between authors leaves it to \LaTeX{} to determine where to break
+% the lines. Using \AND forces a linebreak at that point. So, if \LaTeX{}
+% puts 3 of 4 authors names on the first line, and the last on the second
+% line, try using \AND instead of \And before the third author name.
+
+\newcommand{\fix}{\marginpar{FIX}}
+\newcommand{\new}{\marginpar{NEW}}
+\input{commands}
+
+\nipsfinalcopy % Uncomment for camera-ready version
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+The growth of the Internet and electronic databases in general has led to an
+increasing concern about the privacy of users' information. These databases
+enable researchers and corporations alike to learn information, such as
+identifying new trends or learning to recommend movies, from large
+groups of people. Although increasingly useful, these methods come at the cost
+of users' privacy: the more questions we ask about a large dataset of users'
+information, the more information we receive about each individual user's
+information. Prior work, including \cite{narayanan2008robust,
+sweeney1997weaving, ganta2008composition}, has shown that even anonymous
+datasets can reveal sensitive details about individuals.
+
+Differential privacy aims to provide provable privacy for users with high probability, while allowing queries that reveal details about the dataset as a whole. Combining differential privacy and machine learning methods have been giving rise to new algorithms and new theoretical guarantees.
+
+In the project, we will learn the fundamental concepts about differential privacy, understand differentially-private algorithms and their guarantees, and trade-offs that are imposed by the differential privacy property.
+
+% Reading List
+% Some broad motivation for the need for differential privacy. \cite{narayanan2008robust}
+% Fundamentals of differential privacy from excerpts of a book. \cite{dwork2014algorithmic}
+% A survey of differential privacy results. \cite{dwork2008differential}
+% Applications of differential privacy in empirical risk minimization, which include logistic regression and SVM.~\cite{chaudhuri2011differentially} If time permits, papers from recent conferences.
+
+\section{Overview}
+
+\section{Privacy-Preserving Machine Learning}
+Privacy is crucial in some machine learning applications, especially when operating on sensitive data such as medical records. In this section, we discuss how to preserve differential privacy during the learning procedure~\cite{chaudhuri2011erm}.
+
+Such learned relationship may reveal certain properties of the training data and lead to privacy leak.
+
+We consider the standard supervised learning setting, where we aim to learn a mapping $f: \X \rightarrow \Y$ from the training data $D = \{(x_i, y_i) \in \X \times \Y\}_{i=1}^n$. One way to solve for such a function $f$ is through empirical risk minimization (ERM):
+
+
+$$f^* = \argmin_{f\in \F} R(f, D) \ =\argmin_{f\in \F} \frac{1}{n}\sum_{i=1}^n L(f(x_i), y_i) + \lambda N(f)$$
+
+$\F$ is a function class which $f$ is optimized over. $L:\Y \times \Y \rightarrow \R$ is a loss function. $N(\cdot)$ is a regularizer which penalizes the complexity of $f$. 
+
+{\small
+\bibliographystyle{plain}
+\bibliography{proposal}
+}
+
+\end{document}
