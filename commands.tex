@@ -1,7 +1,14 @@
-\usepackage{amsmath, dsfont}
+\usepackage{amsmath, caption, dsfont, mathtools}
+\usepackage[noend]{algpseudocode}
+\newtheorem{theorem}{Theorem}
+
+\DeclareCaptionType{algorithm}
 
 \DeclareMathOperator*{\argmin}{argmin}
 \DeclareMathOperator*{\argmax}{argmax}
+
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+\DeclarePairedDelimiter{\norm}{\lVert}{\rVert}
 
 \newcommand{\F}{\ensuremath{\mathcal{F}}}
 \newcommand{\X}{\ensuremath{\mathcal{X}}}
