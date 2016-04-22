@@ -2,11 +2,25 @@
 \usepackage{amsmath,textcomp,amssymb,geometry,graphicx,hyperref,mathtools}
 
 \newcommand{\Dc}{\mathcal{D}}
+\DeclareMathOperator*{\argmin}{argmin}
+\DeclarePairedDelimiter{\norm}{\lVert}{\rVert}
 
 \begin{document}
-
+$\epsilon$-differentially private ERM
 \begin{align*}
-\min_{f} L(f, \Dc) + \lambda \Omega(f)
+\min_{w} L(w, \Dc) + \lambda \Omega(w)\\
+\tilde{w} \leftarrow \argmin_{w} L(w, \Dc) + \lambda \Omega(w)\\
+\tilde{w} \leftarrow \tilde{w} + b\\
+b\sim \text{Laplace}(\frac{2}{n\lambda\epsilon})\\
+\tilde{w} \leftarrow \argmin_f \begin{pmatrix*}[l]
+L(w, \Dc) + \lambda \Omega(w) \\+ \frac{1}{n}b^T w
+\end{pmatrix*}\\
+\norm{b}\sim \text{Laplace}(\frac{1}{\epsilon})
 \end{align*}
 
+\begin{align*}
+P(L(\tilde{w}) \le L(w) + \Delta) \ge 1 - 2\delta\\
+n = O(\frac{d\log{(\frac{d}{\delta})}}{\Delta^{\frac{3}{2}}\epsilon})\\
+n = O(\frac{d\log{(\frac{d}{\delta})}}{\Delta \epsilon})
+\end{align*}
 \end{document}
