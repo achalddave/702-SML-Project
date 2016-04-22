@@ -1,0 +1,244 @@
+\documentclass{article} % For LaTeX2e
+\usepackage{nips15submit_e,times}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage[inline]{enumitem}
+\usepackage{amssymb}
+\usepackage{amsthm}
+%\documentstyle[nips14submit_09,times,art10]{article} % For LaTeX 2.09
+
+\title{A Survey on Differential Privacy}
+
+\author{
+Achal Dave* \\
+\texttt{achald@cs.cmu.edu} \\
+\And
+Jingyan Wang* \\
+\texttt{jingyanw@cs.cmu.edu} \\
+\\
+}
+
+% The \author macro works with any number of authors. There are two commands
+% used to separate the names and addresses of multiple authors: \And and \AND.
+%
+% Using \And between authors leaves it to \LaTeX{} to determine where to break
+% the lines. Using \AND forces a linebreak at that point. So, if \LaTeX{}
+% puts 3 of 4 authors names on the first line, and the last on the second
+% line, try using \AND instead of \And before the third author name.
+
+\newcommand{\fix}{\marginpar{FIX}}
+\newcommand{\new}{\marginpar{NEW}}
+\input{commands}
+
+\nipsfinalcopy % Uncomment for camera-ready version
+
+\begin{document}
+
+\maketitle
+
+%\section{Logistics}
+%
+%\begin{enumerate}[label=(\roman*)]
+%\item Introduction:
+%
+%Please see Section 1 and 2.
+%\item What we have done so far:
+%
+%We read part of the book~\cite{dwork2014algorithmic} for the background and introduction. We read~\cite{chaudhuri2011erm} on differential privacy in machine learning.
+%\item What remains to be done:
+%
+%We plan to scrutinize and summarize the proof ideas in~\cite{chaudhuri2011erm}.
+%
+%We also plan to survey and read a few more papers. The options include:
+%\begin{itemize}
+%\item Privacy attack approaches when databases are not protected by differential privacy, \emph{e.g.}~\cite{ganta2008composition}.
+%\item Further parts in the book.
+%\item Relevant papers from recent conferences.
+%\end{itemize}
+%\item Division of work:
+%
+%We both read the papers above. AD wrote Section 2; JW wrote Section 3.
+%\end{enumerate}
+
+\section{Introduction}
+The growth of the Internet and electronic databases has led to an
+increasing concern about the privacy of users' information. These databases
+enable researchers to learn information, such as
+identifying new trends or learning to recommend movies, from large
+groups of people. Although increasingly useful, these methods come at the cost
+of users' privacy: the more questions we ask about a large dataset of users'
+information, the more information we receive about each individual user's
+information. Prior work, including \cite{narayanan2008robust,
+sweeney1997weaving, ganta2008composition}, has shown that even anonymous
+datasets can reveal sensitive details about individuals.
+
+Differential privacy aims to provide provable privacy for users with high probability, while allowing queries that reveal details about the dataset as a whole. Combining differential privacy and machine learning methods have been giving rise to new algorithms and new theoretical guarantees.
+
+In the project, we survey the fundamental concepts about differential privacy, understand differentially-private algorithms and their guarantees, and trade-offs that are imposed by the differential privacy property.
+
+% Reading List
+% Some broad motivation for the need for differential privacy. \cite{narayanan2008robust}
+% Fundamentals of differential privacy from excerpts of a book. \cite{dwork2014algorithmic}
+% A survey of differential privacy results. \cite{dwork2008differential}
+% Applications of differential privacy in empirical risk minimization, which include logistic regression and SVM.~\cite{chaudhuri2011differentially} If time permits, papers from recent conferences.
+
+\section{Overview}\label{overview}
+We first formalize the notion of differential privacy, following~\cite{dwork2014algorithmic}.
+
+We consider datasets that are collections of records from some
+universe $\mathcal{X}$. Further, we can represent such a dataset $x$ as a
+\textit{histogram} of records, so that $x \in \mathbb{N}^{\abs{\X}}$. If we want
+to collect a dataset where we ask people to say whether they smoke or not, the
+universe of responses is $\mathcal{X} = \{0, 1\}$, and the histogram
+representation is simply a count of the number of people who smoke and the
+number of people who do not smoke.
+
+We would like to answer \textit{queries} from datasets while preserving some
+notion of privacy. We let $\mathcal{M}$ be a mechanism for answering
+queries. To preserve privacy, we want the response of this mechanism
+to have a similar distribution regardless of any one individual's response.
+That is, we want that for two datasets $x, y$ that differ in only one
+individual (that is, $\norm{x - y}_1 \leq 1$), the distribution of
+$\mathcal{M}(x)$ is close to $\mathcal{M}(y)$.
+
+With this notation, we can formalize $(\epsilon, \delta)$-differential privacy.
+
+\theoremstyle{definition}
+\begin{definition}{(Differential Privacy)}
+A random mechanism $\mathcal{M}$ is $(\epsilon, \delta)$-differentially private
+if for all $\mathcal{S} \subseteq \textrm{Range}(\mathcal{M})$ and for all
+datasets $x, y \in \mathbb{N}^{\abs{\mathcal{X}}}$
+such that $\norm{x - y}_1 \leq 1$,
+\begin{align*}
+P(\mathcal{M}(x) \in \mathcal{S}) \leq \exp{(\epsilon)} P(\mathcal{M}(y) \in \mathcal{S}) + \delta
+\end{align*}
+\end{definition}
+
+A simple, intuitive way of ensuring differential privacy is to add noise to the
+output of queries. Suppose a query
+\[ f(x) : \mathbb{N}^{\abs{\mathcal{X}}} \rightarrow \mathbb{R}^k \]
+is requested. Then, instead of
+returning $f(X)$, we can return $f(x) + (Y_1, \dots, Y_K)$, where $Y_i$ is noise
+drawn from some distribution. However, the noise must depend, in some sense, on
+how much $f$ can change for values of $x, y$ close to each other.
+
+We can formalize this as follows. Define $\Delta f$, the $l_1$-sensitivity of
+$f$, as follows:
+\begin{align*}
+\Delta f = \max_{x, y \in \Nb^{\abs{\Xc}}, \norm{x - y}_1 = 1} \norm{f(x) - (y)}_1
+\end{align*}
+
+If $f$ is highly sensitive, then we will need to add more noise to protect an
+adversary from distinguishing $x$ or $y$ based on $f(x)$ and $f(y)$. It turns
+out that we can use the Laplace mechanism to do this.
+
+\begin{definition}{(Laplace Mechanism)}
+For any function $f : \Nb^{\abs{\Xc}} \rightarrow \Rb^k$ with $l_1$-sensitivity
+$\Delta f$, the Laplace mechanism is defined as
+\begin{align*}
+\Mc_L(x, f(\cdot), \epsilon) = f(x) + (Y_1, \dots, Y_k)
+\end{align*}
+where $Y_i$ are i.i.d. drawn from Lap($\Delta f / \epsilon$).
+\end{definition}
+
+It can be shown that this mechanism provides $(\epsilon, 0)$ differential
+privacy. Note that this mechanism adds noise to the response of the query.
+In some cases, adding noise to the response of a query can drastically lower
+the utility of the response. In this case, we can instead consider the
+exponential mechanism, which allows specifying a utility function for responses.
+
+Define a utility function $u : \Nb^{\abs{\Xc}} \times \Rc \rightarrow \Rb$,
+which assings a utility to a response for a given database. Similar to the
+sensitivity of $f$, let's define the sensitivity of $u$:
+\begin{align*}
+\Delta u \triangleq \max_{r \in \Rc} \max_{x, y : \norm{x - y}_1 \leq 1} \abs{u(x, r) - u(y, r)}
+\end{align*}
+
+For this utility function, the exponential mechanism is defined as follows
+\begin{definition}{(Exponential Mechanism)}
+The exponential mechanism $\Mc_E(x, u, \Rc)$ outputs an element $r \in \Rc$ with
+probability proportional to $\exp{(\frac{\epsilon u(x, r)}{2 \Delta u})}$.
+\end{definition}
+
+Unlike the Laplace mechanism, the exponential mechanism doesn't add arbitrary
+noise to the response; instead, it simply randomizes \textit{which} of a set of
+responses to return, so that the utility is not drastically reduced with high
+probability. It can be shown that the exponential mechanism preserves
+$(\epsilon, 0)$ differential privacy.
+
+\section{Privacy-Preserving Machine Learning}
+In this section, we discuss how to preserve differential privacy during the learning procedure~\cite{chaudhuri2011erm}.
+
+We consider the standard supervised learning setting, where we aim to learn a mapping $f: \X \rightarrow \Y$ from the training data $D = \{(x_i, y_i) \in \X \times \Y\}_{i=1}^n$. One way to solve for such a function $f$ is through empirical risk minimization (ERM):
+$$f^* = \argmin_{f\in \F} R(f, D) \ =\argmin_{f\in \F} \frac{1}{n}\sum_{i=1}^n L(f(x_i), y_i) + \lambda N(f)$$
+$\F$ is a function class which $f$ is optimized over. $L:\Y \times \Y \rightarrow \R$ is a loss function. $N(\cdot)$ is a regularizer which penalizes the complexity of $f$. Specifically, we consider the classification problem with a linear predictor $f(x) = f^T x$ where $f\in \R^d$.
+
+The mapping $f$ may reveal certain properties of the training data and lead to privacy leak. Following ideas from Section~\ref{overview}, we add noise to the learning procedure to preserve privacy. We discuss two approaches: (1) \emph{output perturbation}: solve $\hat{f}$ and perturb $\hat{f}$ (2) \emph{objective perturbation}: perturb the objective function $R(f, D)$ and solve for $\hat{f}$ from the perturbed objective.
+
+\subsection{Output Perturbation}
+We solve the ERM and perturb the optimizer using the Laplace mechanism. The procedure is given in Algorithm~\ref{output_perturb}.
+
+\begin{algorithm}[htb]
+\begin{algorithmic}[1]
+  \Function{Output Perturbation}{$D, \epsilon, \lambda$}
+	\State Solve $\hat{f} = \argmin_f R(f, D)$.
+	\State Draw a random vector $b\in \R^d, \norm{b}\sim \text{Lap}(\frac{1}{\beta})$, where $\beta = \frac{n\lambda \epsilon}{2}$.
+    \State Return $f_{p} = \hat{f} + b$
+   \EndFunction
+\end{algorithmic}
+\caption{Output perturbation}\label{alg:output_perturb}
+\end{algorithm}
+
+\subsubsection{Privacy Guarantees}
+\begin{theorem}
+If $N$ is differentiable and $1$-strongly convex; $L$ is convex and differentiable with $\abs{L'} \le 1$, then Algorithm~\ref{alg:output_perturb} is $\epsilon$-differentially private.
+\end{theorem}
+
+\subsubsection{Performance Guarantees}
+We denote $n$ as the number of samples to achieve error $L^* + \epsilon_g$, where $L^*$ is the loss achieved by the predictor $f_0$.
+
+\begin{theorem} (Details omitted for progress report)
+$$n > C\max{\left\{\frac{\norm{f_0}^2 \log{\frac{1}{\delta}}}{\epsilon_g^2}, \frac{d\log{\frac{d}{\delta}}\norm{f_0}^2}{\epsilon_g \epsilon}, \frac{d\log{\frac{d}{\delta}}\sqrt{c} \norm{f_0}^2}{\epsilon_g^{\frac{3}{2}}\epsilon}\right\}}.$$
+\end{theorem}
+
+
+\subsection{Objective Perturbation}
+Alternative to perturbing the solution of the algorithm, we can also perturb the objective before optimization. The procedure is given in Algorithm~\ref{alg:obj_perturb}.
+
+\begin{algorithm}[htb]
+\begin{algorithmic}[1]
+  \Function{Objective Perturbation}{$D, \epsilon, \lambda$}
+    \State Set $\epsilon' = \epsilon - \log{(1 + \frac{2c}{n\lambda} + \frac{c^2}{n\lambda^2})}$.
+    \If{$\epsilon' > 0$}
+	\State $\Delta = 0$.
+    \Else
+	\State $\epsilon' = \frac{\epsilon}{2}$.
+	\State $\Delta = \frac{c}{n(e^{\frac{\epsilon}{4}} - 1} = \lambda$.
+    \EndIf
+    \State Draw a random vector $b\in \R^d, \norm{b}\sim \text{Lap}(\frac{1}{\beta})$, where $\beta = \frac{\epsilon'}{2}$.
+    \State Return $f_{p} = \argmin_f R(f, D) + \frac{1}{n} b^T f + \frac{1}{2}\Delta\norm{f}^2 $
+   \EndFunction
+\end{algorithmic}
+\caption{Objective perturbation}\label{alg:obj_perturb}
+\end{algorithm}
+
+\subsubsection{Privacy Guarantees}
+\begin{theorem}
+If $N$ is doubly differentiable and $1$-strongly convex; $L$ is convex and doubly differentiable with $\abs{L'} \le 1, \abs{L''} \le c$, then Algorithm~\ref{alg:obj_perturb} is $\epsilon$-differentially private.
+\end{theorem}
+\subsubsection{Performance Guarantees}
+Objective perturbation has a better generalization bound compared to output perturbation.
+\begin{theorem} (Details omitted for progress report)
+$$n > C\max{\left\{ \frac{\norm{f_0}^2 \log{\frac{1}{\delta}}}{\epsilon_g^2}, \frac{c\norm{f_0}^2}{\epsilon_g \epsilon}, \frac{d\log{\frac{d}{\delta}} \norm{f_0}}{\epsilon_g\epsilon}\right\}}.$$
+\end{theorem}
+\subsection{Parameter Tuning}
+\subsection{Examples}
+	\subsubsection{Logistic Regression}
+	\subsubsection{SVM}
+
+{\small
+\bibliographystyle{plain}
+\bibliography{proposal}
+}
+
+\end{document}
