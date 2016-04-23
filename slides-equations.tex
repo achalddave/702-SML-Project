@@ -1,26 +1,35 @@
 \documentclass[11pt]{article}
-\usepackage{amsmath,textcomp,amssymb,geometry,graphicx,hyperref,mathtools}
+\usepackage{amsmath,textcomp,amssymb,geometry,graphicx,hyperref,mathtools, color, dsfont}
+\usepackage[dvipsnames]{xcolor}
 
 \newcommand{\Dc}{\mathcal{D}}
+\newcommand{\R}{\mathds{R}}
 \DeclareMathOperator*{\argmin}{argmin}
 \DeclarePairedDelimiter{\norm}{\lVert}{\rVert}
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
 
 \begin{document}
 $\epsilon$-differentially private ERM
 \begin{align*}
-\min_{w} L(w, \Dc) + \lambda \Omega(w)\\
+\min_{w\in \R^d} L(w, \Dc) + \lambda \Omega(w)\\
 \tilde{w} \leftarrow \argmin_{w} L(w, \Dc) + \lambda \Omega(w)\\
-\tilde{w} \leftarrow \tilde{w} + b\\
-b\sim \text{Laplace}(\frac{2}{n\lambda\epsilon})\\
-\tilde{w} \leftarrow \argmin_f \begin{pmatrix*}[l]
-L(w, \Dc) + \lambda \Omega(w) \\+ \frac{1}{n}b^T w
+\tilde{w} \leftarrow \tilde{w} +{\color{red} b}\\
+\color{red}\norm{b}\sim \text{Laplace}(\frac{2}{n\lambda\epsilon})\\
+\tilde{w} \leftarrow \argmin_w \begin{pmatrix*}[l]
+L(w, \Dc) + \lambda \Omega'(w) \\
++{\color{red}\frac{1}{n}b^T w}
 \end{pmatrix*}\\
-\norm{b}\sim \text{Laplace}(\frac{1}{\epsilon})
+\color{red} \norm{b}\sim \text{Laplace}(\frac{1}{\epsilon})
 \end{align*}
 
 \begin{align*}
 P(L(\tilde{w}) \le L(w) + \Delta) \ge 1 - 2\delta\\
-n = O(\frac{d\log{(\frac{d}{\delta})}}{\Delta^{\frac{3}{2}}\epsilon})\\
-n = O(\frac{d\log{(\frac{d}{\delta})}}{\Delta \epsilon})
+n = O(\frac{d\log{(\frac{d}{\color{Plum}\delta})}}{{\color{Plum}{\Delta}}^{\color{red}\frac{3}{2}}\epsilon})\\
+n = O(\frac{d\log{(\frac{d}{\delta})}}{\Delta \epsilon})\\
+\color{Plum} \ge 1 - 2\delta\\
+\color{Plum} \abs{L(\tilde{w}, \Dc) - L(w, \Dc)} \le \Delta\\
+\color{Plum}\abs{L(\tilde{w}, \Dc) - L(w, \Dc)} \text{ differ by } \Delta\\
+\color{Plum}L(\tilde{w}, \Dc)\\
+\color{Plum}L(w, \Dc)
 \end{align*}
 \end{document}
