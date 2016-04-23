@@ -6,3 +6,5 @@
 *.pdf
 *.synctex.gz
 *.DS_Store
+*.fls
+*.fdb_latexmk
