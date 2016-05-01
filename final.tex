@@ -5,15 +5,16 @@
 \usepackage[inline]{enumitem}
 \usepackage{amssymb}
 \usepackage{amsthm}
+\usepackage{cleveref}
 %\documentstyle[nips14submit_09,times,art10]{article} % For LaTeX 2.09
 
 \title{A Survey on Differential Privacy}
 
 \author{
-Achal Dave* \\
+Achal Dave \\
 \texttt{achald@cs.cmu.edu} \\
 \And
-Jingyan Wang* \\
+Jingyan Wang \\
 \texttt{jingyanw@cs.cmu.edu} \\
 \\
 }
@@ -103,7 +104,6 @@ $\mathcal{M}(x)$ is close to $\mathcal{M}(y)$.
 
 With this notation, we can formalize $(\epsilon, \delta)$-differential privacy.
 
-\theoremstyle{definition}
 \begin{definition}{(Differential Privacy)}
 A random mechanism $\mathcal{M}$ is $(\epsilon, \delta)$-differentially private
 if for all $\mathcal{S} \subseteq \textrm{Range}(\mathcal{M})$ and for all
@@ -140,6 +140,7 @@ $\Delta f$, the Laplace mechanism is defined as
 \Mc_L(x, f(\cdot), \epsilon) = f(x) + (Y_1, \dots, Y_k)
 \end{align*}
 where $Y_i$ are i.i.d. drawn from Lap($\Delta f / \epsilon$).
+\label{def:laplace_mechanism}
 \end{definition}
 
 It can be shown that this mechanism provides $(\epsilon, 0)$ differential
@@ -183,8 +184,8 @@ We solve the ERM and perturb the optimizer using the Laplace mechanism. The proc
 \begin{algorithm}[htb]
 \begin{algorithmic}[1]
   \Function{Output Perturbation}{$D, \epsilon, \lambda$}
-	\State Solve $\hat{f} = \argmin_f R(f, D)$.
-	\State Draw a random vector $b\in \R^d, \norm{b}\sim \text{Lap}(\frac{1}{\beta})$, where $\beta = \frac{n\lambda \epsilon}{2}$.
+    \State Solve $\hat{f} = \argmin_f R(f, D)$.
+    \State Draw a random vector $b\in \R^d, \norm{b}\sim \text{Lap}(\frac{1}{\beta})$, where $\beta = \frac{n\lambda \epsilon}{2}$.
     \State Return $f_{p} = \hat{f} + b$
    \EndFunction
 \end{algorithmic}
@@ -195,6 +196,63 @@ We solve the ERM and perturb the optimizer using the Laplace mechanism. The proc
 \begin{theorem}
 If $N$ is differentiable and $1$-strongly convex; $L$ is convex and differentiable with $\abs{L'} \le 1$, then Algorithm~\ref{alg:output_perturb} is $\epsilon$-differentially private.
 \end{theorem}
+
+\begin{proof}
+Let $h(D) = \argmin_f R(f, D)$. Then, $h$ is a query on a dataset that
+returns some value. From \Cref{cor:output_perturb_sensitivity}, we know that
+$\Delta h$, the sensitivity of $h$, is $\frac{n \lambda}{2}$. Then,
+\cref{alg:output_perturb} is simply the Laplace mechanism from
+\Cref{def:laplace_mechanism} where the noise is drawn from a
+$Lap(\frac{2}{n \lambda \epsilon})$, and therefore is $\epsilon-$differentially
+private.
+\end{proof}
+
+\begin{cor}
+The sensitivity of $\argmin_f R(f, D)$ is at most $\frac{n \Lambda}{2}$.
+\label{cor:output_perturb_sensitivity}
+\end{cor}
+\begin{proof}
+Let $D = \{(x_1, y_1), \dots, (x_n, y_n)\}$ and
+$D' = \{(x_1, y_1), \dots, (x_n', y_n')\}$
+be two datasets that differ in the value of the $n$th individual.
+Let
+\begin{align*}
+G(f) &= J(f, D) \\
+g(f) &= J(f, D') - J(f, D) \\
+     &= \tfrac{1}{n} (L(y_n' f^T x_n') - L(y_n f^T x_n)).
+\end{align*}
+
+By the convexity of $L$ and the $1$-strong convexity of $N(\dot)$, we know that
+$J(f, D)$ is $\Lambda-$strongly convex, and therefore, so are $G(f)$ and
+$G(f) + g(f)$.
+Further,
+\begin{align*}
+\nabla g(f) = \tfrac{1}{n}(y_n' L'(y_n' f^T x_n') x_n' - y_n L'(y_n f^T x_n) x_n)
+\end{align*}
+
+Since $y_i \in [-1, 1], \abs{L'(z)} \leq 1$ for all $z$, and
+$\norm{x_i} \leq 1$, we can see that for any $f$,
+\begin{align*}
+\norm{\nabla g(f)} \leq \tfrac{1}{n} \norm{x_n' - x_n} \leq \frac{2}{n}
+\end{align*}.
+
+We can now appeal to \Cref{lemma:strong_convex_sensitivity} to conclude the
+proof.
+\end{proof}
+
+\begin{lemma}
+Let $G(f)$ and $g(f)$ be continuous vector-valued functions which are
+differentialbe at all points. Let $G(f)$ and $G(f) + g(f)$ be $\lambda-$strongly
+convex. If $f_1 = \argmin_f G(f)$, and $f_2 = \argmin_f G(f) + g(f)$, then
+\begin{align*}
+\norm{f_1 - f_2} \leq \tfrac{1}{\lambda} \max_f \norm{\nabla g(f)}
+\end{align*}
+\label{lemma:strong_convex_sensitivity}
+\end{lemma}
+
+\begin{proof}
+TODO(achald): Should we write out this proof?
+\end{proof}
 
 \subsubsection{Performance Guarantees}
 We denote $n$ as the number of samples to achieve error $L^* + \epsilon_g$, where $L^*$ is the loss achieved by the predictor $f_0$.

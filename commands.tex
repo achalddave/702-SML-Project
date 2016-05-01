@@ -1,6 +1,5 @@
 \usepackage{amsmath, caption, dsfont, mathtools}
 \usepackage[noend]{algpseudocode}
-\newtheorem{theorem}{Theorem}
 
 \DeclareCaptionType{algorithm}
 
@@ -29,4 +28,7 @@
 \renewcommand{\norm}[1]{\left\lVert#1\right\rVert}
 \renewcommand{\abs}[1]{\left\lvert#1\right\rvert}
 
-\newtheorem{definition}{Definition}[section]
+\newtheorem{theorem}{Theorem}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{cor}[theorem]{Corollary}
+\newtheorem{lemma}[theorem]{Lemma}
