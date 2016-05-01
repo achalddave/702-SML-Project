@@ -370,10 +370,34 @@ Objective perturbation has a better generalization bound compared to output pert
 \begin{theorem} (Details omitted for progress report)
 $$n > C\max{\left\{ \frac{\norm{f_0}^2 \log{\frac{1}{\delta}}}{\epsilon_g^2}, \frac{c\norm{f_0}^2}{\epsilon_g \epsilon}, \frac{d\log{\frac{d}{\delta}} \norm{f_0}}{\epsilon_g\epsilon}\right\}}.$$
 \end{theorem}
-\subsection{Parameter Tuning}
-\subsection{Examples}
-	\subsubsection{Logistic Regression}
-	\subsubsection{SVM}
+
+TODO: compare the sample complexity for the two methods in word
+\section{Parameter Tuning}
+\section{Examples}
+In this section, we briefly give examples on how standard learning algorithms fit in this framework.
+	\subsection{Logistic Regression}
+	In regularized logistic regression, we have
+	\begin{align*}
+	& N(f) = \frac{1}{2} \norm{f}^2\\
+	& l(z) = \log{(1 + e^{-z})}
+	\end{align*}
+
+	$l$ is continuous and doubly differentiable with $c = \frac{1}{4}$.
+	\subsection{SVM}
+	In $L_2$-regularized support vector machines,
+	\begin{align*}
+	& N(f) = \frac{1}{2} \norm{f}^2\\
+	& l(z) = \max{(0, 1 - z)}
+	\end{align*}
+
+	This loss function is not differentiable. There are two ways to address the issue:
+	\begin{enumerate}[label=(\roman*)]
+		\item Use a doubly differentiable surrogate function.
+		\item Use a differentiable surrogate function.
+		For example, the Huber loss is only piecewise doubly differentiable. We slightly modify the proofs by arguing that the set in which the function is not differentiable has measure $0$, and hence does not affect the density ratio in the definition of differential privacy.
+	\end{enumerate}
+
+\section{Conclusion}
 
 {\small
 \bibliographystyle{plain}
