@@ -122,7 +122,7 @@ returning $f(X)$, we can return $f(x) + (Y_1, \dots, Y_k)$, where $Y_i$ is noise
 drawn from some distribution. However, the noise must depend, in some sense, on
 how much $f$ can change for values of $x, y$ close to each other.
 
-We can formalize this as follows. Define $\Delta f$, the $l_1$-sensitivity of
+We can formalize this as follows. Define $\Delta f$, the $L_1$-sensitivity of
 $f$, as follows:
 \begin{align*}
 \Delta f = \max_{\substack{x, y \in \Nb^{\abs{\Xc}} \\ \norm{x - y}_1 = 1}}
@@ -134,7 +134,7 @@ adversary from distinguishing $x$ or $y$ based on $f(x)$ and $f(y)$. It turns
 out that we can use what is known as the Laplace mechanism to do this.
 
 \begin{definition}{(Laplace Mechanism)}
-For any function $f : \Nb^{\abs{\Xc}} \rightarrow \Rb^k$ with $l_1$-sensitivity
+For any function $f : \Nb^{\abs{\Xc}} \rightarrow \Rb^k$ with $L_1$-sensitivity
 $\Delta f$, the Laplace mechanism is defined as
 \begin{align*}
 \Mc_L(x, f(\cdot), \epsilon) = f(x) + (Y_1, \dots, Y_k)
@@ -198,17 +198,49 @@ If $N$ is differentiable and $1$-strongly convex; $L$ is convex and differentiab
 \end{theorem}
 
 \begin{proof}
-Let $h(D) = \argmin_f R(f, D)$. Then, $h$ is a query on a dataset that
+Before touching the details of the proof, it is useful to notice that this method
+is very similar to the Laplace mechanism form \Cref{def:laplace_mechanism}.
+Let $h(D) = \argmin_f R(f, D)$, which is just a query on a dataset that
 returns some value. From \Cref{cor:output_perturb_sensitivity}, we know that
-$\Delta h$, the sensitivity of $h$, is $\frac{n \lambda}{2}$. Then,
-\cref{alg:output_perturb} is simply the Laplace mechanism from
+$\Delta_2 h$, the $L_2$ sensitivity of $h$, is $\frac{n \lambda}{2}$. Then,
+\Cref{alg:output_perturb} is similar to the Laplace mechanism from
 \Cref{def:laplace_mechanism} where the noise is drawn from a
-$Lap(\frac{2}{n \lambda \epsilon})$, and therefore is $\epsilon-$differentially
-private.
+$Lap(\frac{2}{n \lambda \epsilon})$, except that here we rely on the $L_2$
+instead of $L_1$ sensitivity, and we draw the magnitude of the noise vector at
+random rather than drawing individual elements at random.
+
+Now, we explicitly prove that this method preserves differential privacy.
+Consider two datasets $D$ and $D'$ that differ in the value of one individual.
+Let $f_1$ and $f_2$ be the solutions output by non-private ERM for datasets $D$
+and $D'$ respectively. Let $g(f | D)$ be the density of the solution output by
+\Cref{alg:output_perturb} for dataset $D$, and $g(f | D')$ the same for dataset
+$D'$.
+
+Since we draw $\norm{b}$ from Lap$(\frac{1}{\beta})$, then the density for
+any fixed $b_0$ is proportional to $\exp(-\beta \norm{b_0})$. Then,
+\begin{align*}
+\frac{g(f | D)}{g(f | D')}
+    &= \frac{
+         \exp(-\tfrac{n\Lambda\epsilon_p}{2} \norm{b + f_1})
+       }{
+         \exp(-\tfrac{n\Lambda\epsilon_p}{2} \norm{b + f_2})
+       } \\
+    &= \exp(-\tfrac{n\Lambda\epsilon_p}{2} (\norm{b + f_2} - \norm{b + f_1})) \\
+    &\leq \exp(-\tfrac{n\Lambda\epsilon_p}{2} \norm{f_2 - f_1})
+\end{align*}
+
+From \Cref{cor:output_perturb_sensitivity}, we know that the $L_2$ sensitivity
+of $\argmin_f R(f, D) \leq \frac{2}{n \Lambda}$, so that
+$\norm{f_2 - f_1} \leq \frac{2}{n \Lambda}$. With this, we have satisfied the
+definition of $\epsilon_p$ differential privacy:
+\begin{align*}
+\frac{g(f | D)}{g(f | D')} &\leq \exp(-\epsilon_p),
+\end{align*}
+concluding the proof.
 \end{proof}
 
 \begin{cor}
-The sensitivity of $\argmin_f R(f, D)$ is at most $\frac{n \Lambda}{2}$.
+The $L_2$ sensitivity of $\argmin_f R(f, D)$ is at most $\frac{2}{n \Lambda}$.
 \label{cor:output_perturb_sensitivity}
 \end{cor}
 \begin{proof}
@@ -219,7 +251,7 @@ Let
 \begin{align*}
 G(f) &= J(f, D) \\
 g(f) &= J(f, D') - J(f, D) \\
-     &= \tfrac{1}{n} (L(y_n' f^T x_n') - L(y_n f^T x_n)).
+     &= \frac{1}{n} (L(y_n' f^T x_n') - L(y_n f^T x_n)).
 \end{align*}
 
 By the convexity of $L$ and the $1$-strong convexity of $N(\dot)$, we know that
@@ -227,7 +259,8 @@ $J(f, D)$ is $\Lambda-$strongly convex, and therefore, so are $G(f)$ and
 $G(f) + g(f)$.
 Further,
 \begin{align*}
-\nabla g(f) = \tfrac{1}{n}(y_n' L'(y_n' f^T x_n') x_n' - y_n L'(y_n f^T x_n) x_n)
+\nabla g(f)
+= \frac{1}{n} \left(y_n' L'(y_n' f^T x_n') x_n' - y_n L'(y_n f^T x_n) x_n\right)
 \end{align*}
 
 Since $y_i \in [-1, 1], \abs{L'(z)} \leq 1$ for all $z$, and
@@ -245,7 +278,7 @@ Let $G(f)$ and $g(f)$ be continuous vector-valued functions which are
 differentialbe at all points. Let $G(f)$ and $G(f) + g(f)$ be $\lambda-$strongly
 convex. If $f_1 = \argmin_f G(f)$, and $f_2 = \argmin_f G(f) + g(f)$, then
 \begin{align*}
-\norm{f_1 - f_2} \leq \tfrac{1}{\lambda} \max_f \norm{\nabla g(f)}
+\norm{f_1 - f_2} \leq \frac{1}{\lambda} \max_f \norm{\nabla g(f)}
 \end{align*}
 \label{lemma:strong_convex_sensitivity}
 \end{lemma}
