@@ -68,9 +68,9 @@ identifying new trends or learning to recommend movies, from large
 groups of people. Although increasingly useful, these methods come at the cost
 of users' privacy: the more questions we ask about a large dataset of users'
 information, the more information we receive about each individual user's
-information. Prior work, including \cite{narayanan2008robust,
-sweeney1997weaving, ganta2008composition}, has shown that even anonymous
-datasets can reveal sensitive details about individuals.
+information. Prior work \cite{narayanan2008robust, sweeney1997weaving,
+ganta2008composition} has shown that even anonymous datasets can reveal
+sensitive details about individuals.
 
 Differential privacy aims to provide provable privacy for users with high probability, while allowing queries that reveal details about the dataset as a whole. Combining differential privacy and machine learning methods have been giving rise to new algorithms and new theoretical guarantees.
 
@@ -118,19 +118,20 @@ A simple, intuitive way of ensuring differential privacy is to add noise to the
 output of queries. Suppose a query
 \[ f(x) : \mathbb{N}^{\abs{\mathcal{X}}} \rightarrow \mathbb{R}^k \]
 is requested. Then, instead of
-returning $f(X)$, we can return $f(x) + (Y_1, \dots, Y_K)$, where $Y_i$ is noise
+returning $f(X)$, we can return $f(x) + (Y_1, \dots, Y_k)$, where $Y_i$ is noise
 drawn from some distribution. However, the noise must depend, in some sense, on
 how much $f$ can change for values of $x, y$ close to each other.
 
 We can formalize this as follows. Define $\Delta f$, the $l_1$-sensitivity of
 $f$, as follows:
 \begin{align*}
-\Delta f = \max_{x, y \in \Nb^{\abs{\Xc}}, \norm{x - y}_1 = 1} \norm{f(x) - (y)}_1
+\Delta f = \max_{\substack{x, y \in \Nb^{\abs{\Xc}} \\ \norm{x - y}_1 = 1}}
+                \norm{f(x) - f(y)}_1
 \end{align*}
 
-If $f$ is highly sensitive, then we will need to add more noise to protect an
+If $f$ is highly sensitive, then we will need to add more noise to prevent an
 adversary from distinguishing $x$ or $y$ based on $f(x)$ and $f(y)$. It turns
-out that we can use the Laplace mechanism to do this.
+out that we can use what is known as the Laplace mechanism to do this.
 
 \begin{definition}{(Laplace Mechanism)}
 For any function $f : \Nb^{\abs{\Xc}} \rightarrow \Rb^k$ with $l_1$-sensitivity
@@ -143,6 +144,7 @@ where $Y_i$ are i.i.d. drawn from Lap($\Delta f / \epsilon$).
 
 It can be shown that this mechanism provides $(\epsilon, 0)$ differential
 privacy. Note that this mechanism adds noise to the response of the query.
+
 In some cases, adding noise to the response of a query can drastically lower
 the utility of the response. In this case, we can instead consider the
 exponential mechanism, which allows specifying a utility function for responses.
@@ -176,7 +178,7 @@ $\F$ is a function class which $f$ is optimized over. $L:\Y \times \Y \rightarro
 The mapping $f$ may reveal certain properties of the training data and lead to privacy leak. Following ideas from Section~\ref{overview}, we add noise to the learning procedure to preserve privacy. We discuss two approaches: (1) \emph{output perturbation}: solve $\hat{f}$ and perturb $\hat{f}$ (2) \emph{objective perturbation}: perturb the objective function $R(f, D)$ and solve for $\hat{f}$ from the perturbed objective.
 
 \subsection{Output Perturbation}
-We solve the ERM and perturb the optimizer using the Laplace mechanism. The procedure is given in Algorithm~\ref{output_perturb}.
+We solve the ERM and perturb the optimizer using the Laplace mechanism. The procedure is given in Algorithm~\ref{alg:output_perturb}.
 
 \begin{algorithm}[htb]
 \begin{algorithmic}[1]
