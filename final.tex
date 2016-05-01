@@ -5,15 +5,16 @@
 \usepackage[inline]{enumitem}
 \usepackage{amssymb}
 \usepackage{amsthm}
+\usepackage{cleveref}
 %\documentstyle[nips14submit_09,times,art10]{article} % For LaTeX 2.09
 
 \title{A Survey on Differential Privacy}
 
 \author{
-Achal Dave* \\
+Achal Dave \\
 \texttt{achald@cs.cmu.edu} \\
 \And
-Jingyan Wang* \\
+Jingyan Wang \\
 \texttt{jingyanw@cs.cmu.edu} \\
 \\
 }
@@ -68,9 +69,9 @@ identifying new trends or learning to recommend movies, from large
 groups of people. Although increasingly useful, these methods come at the cost
 of users' privacy: the more questions we ask about a large dataset of users'
 information, the more information we receive about each individual user's
-information. Prior work, including \cite{narayanan2008robust,
-sweeney1997weaving, ganta2008composition}, has shown that even anonymous
-datasets can reveal sensitive details about individuals.
+information. Prior work \cite{narayanan2008robust, sweeney1997weaving,
+ganta2008composition} has shown that even anonymous datasets can reveal
+sensitive details about individuals.
 
 Differential privacy aims to provide provable privacy for users with high probability, while allowing queries that reveal details about the dataset as a whole. Combining differential privacy and machine learning methods have been giving rise to new algorithms and new theoretical guarantees.
 
@@ -103,7 +104,6 @@ $\mathcal{M}(x)$ is close to $\mathcal{M}(y)$.
 
 With this notation, we can formalize $(\epsilon, \delta)$-differential privacy.
 
-\theoremstyle{definition}
 \begin{definition}{(Differential Privacy)}
 A random mechanism $\mathcal{M}$ is $(\epsilon, \delta)$-differentially private
 if for all $\mathcal{S} \subseteq \textrm{Range}(\mathcal{M})$ and for all
@@ -118,31 +118,34 @@ A simple, intuitive way of ensuring differential privacy is to add noise to the
 output of queries. Suppose a query
 \[ f(x) : \mathbb{N}^{\abs{\mathcal{X}}} \rightarrow \mathbb{R}^k \]
 is requested. Then, instead of
-returning $f(X)$, we can return $f(x) + (Y_1, \dots, Y_K)$, where $Y_i$ is noise
+returning $f(X)$, we can return $f(x) + (Y_1, \dots, Y_k)$, where $Y_i$ is noise
 drawn from some distribution. However, the noise must depend, in some sense, on
 how much $f$ can change for values of $x, y$ close to each other.
 
-We can formalize this as follows. Define $\Delta f$, the $l_1$-sensitivity of
+We can formalize this as follows. Define $\Delta f$, the $L_1$-sensitivity of
 $f$, as follows:
 \begin{align*}
-\Delta f = \max_{x, y \in \Nb^{\abs{\Xc}}, \norm{x - y}_1 = 1} \norm{f(x) - (y)}_1
+\Delta f = \max_{\substack{x, y \in \Nb^{\abs{\Xc}} \\ \norm{x - y}_1 = 1}}
+                \norm{f(x) - f(y)}_1
 \end{align*}
 
-If $f$ is highly sensitive, then we will need to add more noise to protect an
+If $f$ is highly sensitive, then we will need to add more noise to prevent an
 adversary from distinguishing $x$ or $y$ based on $f(x)$ and $f(y)$. It turns
-out that we can use the Laplace mechanism to do this.
+out that we can use what is known as the Laplace mechanism to do this.
 
 \begin{definition}{(Laplace Mechanism)}
-For any function $f : \Nb^{\abs{\Xc}} \rightarrow \Rb^k$ with $l_1$-sensitivity
+For any function $f : \Nb^{\abs{\Xc}} \rightarrow \Rb^k$ with $L_1$-sensitivity
 $\Delta f$, the Laplace mechanism is defined as
 \begin{align*}
 \Mc_L(x, f(\cdot), \epsilon) = f(x) + (Y_1, \dots, Y_k)
 \end{align*}
 where $Y_i$ are i.i.d. drawn from Lap($\Delta f / \epsilon$).
+\label{def:laplace_mechanism}
 \end{definition}
 
 It can be shown that this mechanism provides $(\epsilon, 0)$ differential
 privacy. Note that this mechanism adds noise to the response of the query.
+
 In some cases, adding noise to the response of a query can drastically lower
 the utility of the response. In this case, we can instead consider the
 exponential mechanism, which allows specifying a utility function for responses.
@@ -176,13 +179,13 @@ $\F$ is a function class which $f$ is optimized over. $L:\Y \times \Y \rightarro
 The mapping $f$ may reveal certain properties of the training data and lead to privacy leak. Following ideas from Section~\ref{overview}, we add noise to the learning procedure to preserve privacy. We discuss two approaches: (1) \emph{output perturbation}: solve $\hat{f}$ and perturb $\hat{f}$ (2) \emph{objective perturbation}: perturb the objective function $R(f, D)$ and solve for $\hat{f}$ from the perturbed objective.
 
 \subsection{Output Perturbation}
-We solve the ERM and perturb the optimizer using the Laplace mechanism. The procedure is given in Algorithm~\ref{output_perturb}.
+We solve the ERM and perturb the optimizer using the Laplace mechanism. The procedure is given in Algorithm~\ref{alg:output_perturb}.
 
 \begin{algorithm}[htb]
 \begin{algorithmic}[1]
   \Function{Output Perturbation}{$D, \epsilon, \lambda$}
-	\State Solve $\hat{f} = \argmin_f R(f, D)$.
-	\State Draw a random vector $b\in \R^d, \norm{b}\sim \text{Lap}(\frac{1}{\beta})$, where $\beta = \frac{n\lambda \epsilon}{2}$.
+    \State Solve $\hat{f} = \argmin_f R(f, D)$.
+    \State Draw a random vector $b\in \R^d, \norm{b}\sim \text{Lap}(\frac{1}{\beta})$, where $\beta = \frac{n\lambda \epsilon}{2}$.
     \State Return $f_{p} = \hat{f} + b$
    \EndFunction
 \end{algorithmic}
@@ -193,6 +196,96 @@ We solve the ERM and perturb the optimizer using the Laplace mechanism. The proc
 \begin{theorem}
 If $N$ is differentiable and $1$-strongly convex; $L$ is convex and differentiable with $\abs{L'} \le 1$, then Algorithm~\ref{alg:output_perturb} is $\epsilon$-differentially private.
 \end{theorem}
+
+\begin{proof}
+Before touching the details of the proof, it is useful to notice that this method
+is very similar to the Laplace mechanism form \Cref{def:laplace_mechanism}.
+Let $h(D) = \argmin_f R(f, D)$, which is just a query on a dataset that
+returns some value. From \Cref{cor:output_perturb_sensitivity}, we know that
+$\Delta_2 h$, the $L_2$ sensitivity of $h$, is $\frac{n \lambda}{2}$. Then,
+\Cref{alg:output_perturb} is similar to the Laplace mechanism from
+\Cref{def:laplace_mechanism} where the noise is drawn from a
+$Lap(\frac{2}{n \lambda \epsilon})$, except that here we rely on the $L_2$
+instead of $L_1$ sensitivity, and we draw the magnitude of the noise vector at
+random rather than drawing individual elements at random.
+
+Now, we explicitly prove that this method preserves differential privacy.
+Consider two datasets $D$ and $D'$ that differ in the value of one individual.
+Let $f_1$ and $f_2$ be the solutions output by non-private ERM for datasets $D$
+and $D'$ respectively. Let $g(f | D)$ be the density of the solution output by
+\Cref{alg:output_perturb} for dataset $D$, and $g(f | D')$ the same for dataset
+$D'$.
+
+Since we draw $\norm{b}$ from Lap$(\frac{1}{\beta})$, then the density for
+any fixed $b_0$ is proportional to $\exp(-\beta \norm{b_0})$. Then,
+\begin{align*}
+\frac{g(f | D)}{g(f | D')}
+    &= \frac{
+         \exp(-\tfrac{n\Lambda\epsilon_p}{2} \norm{b + f_1})
+       }{
+         \exp(-\tfrac{n\Lambda\epsilon_p}{2} \norm{b + f_2})
+       } \\
+    &= \exp(-\tfrac{n\Lambda\epsilon_p}{2} (\norm{b + f_2} - \norm{b + f_1})) \\
+    &\leq \exp(-\tfrac{n\Lambda\epsilon_p}{2} \norm{f_2 - f_1})
+\end{align*}
+
+From \Cref{cor:output_perturb_sensitivity}, we know that the $L_2$ sensitivity
+of $\argmin_f R(f, D) \leq \frac{2}{n \Lambda}$, so that
+$\norm{f_2 - f_1} \leq \frac{2}{n \Lambda}$. With this, we have satisfied the
+definition of $\epsilon_p$ differential privacy:
+\begin{align*}
+\frac{g(f | D)}{g(f | D')} &\leq \exp(-\epsilon_p),
+\end{align*}
+concluding the proof.
+\end{proof}
+
+\begin{cor}
+The $L_2$ sensitivity of $\argmin_f R(f, D)$ is at most $\frac{2}{n \Lambda}$.
+\label{cor:output_perturb_sensitivity}
+\end{cor}
+\begin{proof}
+Let $D = \{(x_1, y_1), \dots, (x_n, y_n)\}$ and
+$D' = \{(x_1, y_1), \dots, (x_n', y_n')\}$
+be two datasets that differ in the value of the $n$th individual.
+Let
+\begin{align*}
+G(f) &= J(f, D) \\
+g(f) &= J(f, D') - J(f, D) \\
+     &= \frac{1}{n} (L(y_n' f^T x_n') - L(y_n f^T x_n)).
+\end{align*}
+
+By the convexity of $L$ and the $1$-strong convexity of $N(\dot)$, we know that
+$J(f, D)$ is $\Lambda-$strongly convex, and therefore, so are $G(f)$ and
+$G(f) + g(f)$.
+Further,
+\begin{align*}
+\nabla g(f)
+= \frac{1}{n} \left(y_n' L'(y_n' f^T x_n') x_n' - y_n L'(y_n f^T x_n) x_n\right)
+\end{align*}
+
+Since $y_i \in [-1, 1], \abs{L'(z)} \leq 1$ for all $z$, and
+$\norm{x_i} \leq 1$, we can see that for any $f$,
+\begin{align*}
+\norm{\nabla g(f)} \leq \frac{2}{n}
+\end{align*}.
+
+We can now appeal to \Cref{lemma:strong_convex_sensitivity} to conclude the
+proof.
+\end{proof}
+
+\begin{lemma}
+Let $G(f)$ and $g(f)$ be continuous vector-valued functions which are
+differentialbe at all points. Let $G(f)$ and $G(f) + g(f)$ be $\lambda-$strongly
+convex. If $f_1 = \argmin_f G(f)$, and $f_2 = \argmin_f G(f) + g(f)$, then
+\begin{align*}
+\norm{f_1 - f_2} \leq \frac{1}{\lambda} \max_f \norm{\nabla g(f)}
+\end{align*}
+\label{lemma:strong_convex_sensitivity}
+\end{lemma}
+
+\begin{proof}
+TODO(achald): Should we write out this proof?
+\end{proof}
 
 \subsubsection{Performance Guarantees}
 We denote $n$ as the number of samples to achieve error $L^* + \epsilon_g$, where $L^*$ is the loss achieved by the predictor $f_0$.
