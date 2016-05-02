@@ -62,20 +62,26 @@ Jingyan Wang \\
 %\end{enumerate}
 
 \section{Introduction}
-The growth of the Internet and electronic databases has led to an
+The growth of the internet and electronic databases has led to an
 increasing concern about the privacy of users' information. These databases
 enable researchers to learn information, such as
 identifying new trends or learning to recommend movies, from large
 groups of people. Although increasingly useful, these methods come at the cost
-of users' privacy: the more questions we ask about a large dataset of users'
-information, the more information we receive about each individual user's
-information. Prior work \cite{narayanan2008robust, sweeney1997weaving,
+of users' privacy: as we ask questions about a large dataset of users'
+information, we receive information of not only the group, but also of
+individual users. Prior work \cite{narayanan2008robust, sweeney1997weaving,
 ganta2008composition} has shown that even anonymous datasets can reveal
 sensitive details about individuals.
 
-Differential privacy aims to provide provable privacy for users with high probability, while allowing queries that reveal details about the dataset as a whole. Combining differential privacy and machine learning methods have been giving rise to new algorithms and new theoretical guarantees.
+Differential privacy aims to provide provable privacy for users, while allowing
+queries that reveal details about the dataset as a whole. Combining differential
+privacy and machine learning methods have been giving rise to new algorithms and
+new theoretical guarantees.
 
-In the project, we survey the fundamental concepts about differential privacy, understand differentially-private algorithms and their guarantees, and trade-offs that are imposed by the differential privacy property.
+In this project, we survey the fundamental concepts about differential privacy,
+and discuss approaches for performing empirical risk minimization while
+maintaining privacy, and consider the tradeoffs between the algorithms as well
+as the tradeoffs between performance and privacy.
 
 % Reading List
 % Some broad motivation for the need for differential privacy. \cite{narayanan2008robust}
