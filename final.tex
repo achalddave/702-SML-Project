@@ -161,6 +161,7 @@ For this utility function, the exponential mechanism is defined as follows
 \begin{definition}{(Exponential Mechanism)}
 The exponential mechanism $\Mc_E(x, u, \Rc)$ outputs an element $r \in \Rc$ with
 probability proportional to $\exp{(\frac{\epsilon u(x, r)}{2 \Delta u})}$.
+\label{def:exponential_mechanism}
 \end{definition}
 
 Unlike the Laplace mechanism, the exponential mechanism doesn't add arbitrary
@@ -373,6 +374,74 @@ $$n > C\max{\left\{ \frac{\norm{f_0}^2 \log{\frac{1}{\delta}}}{\epsilon_g^2}, \f
 
 TODO: compare the sample complexity for the two methods in word
 \section{Parameter Tuning}
+The above methods assumed that we were provided with a fixed value of $\Lambda$,
+the regularization parameter. In practice, however, it is common to perform a
+sweep over a set of values of $\Lambda$. Usually, we can do this by training
+models with multiple values of $\Lambda$, and evaluating them on a hold-out
+validation set and choosing the value that performs best on the hold-out set.
+However, the following theorem from \cite{dwork2014algorithmic} shows that doing
+so is not differentially private:
+
+\begin{theorem}
+Let $\Mc_1$ be an $\epsilon_1$-differentially private algorithm, and let $\Mc_2$
+be an $\epsilon_2$ differentially private algorithm. Then their combination,
+$\Mc_{1,2}(x) = (\Mc_1(x), \Mc_2(x))$ is $\epsilon_1 + \epsilon_2$
+differentially private.
+\end{theorem}
+
+Thus, running the differentially private ERM algorithms from above for $m$
+different $\Lambda$ values would render the result only
+$(m \epsilon)$-differentially private. So, we need an end to end differentially
+private method for choosing $\Lambda$.
+
+One simple option to fix this problem is to tune $\Lambda$ on a public dataset
+where privacy is not of concern. Then, using this tuned $\Lambda$, we can use
+\Cref{alg:output_perturb} or \Cref{alg:obj_perturb} to train a classifier in a
+differentially private manner.
+
+However, such a dataset is not always available. In this cases, we can use the
+exponential mechanism to optimize over possible values of $\Lambda$, as in
+\Cref{def:exponential_mechanism}.
+
+\begin{algorithm}[htb]
+\begin{algorithmic}[1]
+  \Function{Privacy-preserving Parameter Tuning}{$D, \{\Lambda_1, \dots, \Lambda_m\}, \epsilon_p$}
+    \State Divide $D$ into $m + 1$ equal portions $D_1, \dots D_{m+1}$, each of
+           size $\tfrac{\abs{D}}{m + 1}$.
+    \State For each $i = 1, \dots, m$, use a privacy-preserving algorithm
+           (such as \Cref{alg:output_perturb} or \Cref{alg:obj_perturb}) on
+           $D_i$ with parameters $\Lambda_i$ and $\epsilon_p$ to retrieve an
+           output $f_i$.
+    \State Evaluate $z_i$, the number of mistakes made by $f_i$ on $D_{m+1}$.
+    \State Return $f_i$ with probability
+           \begin{align*}
+           \frac{e^{-\epsilon_p z_i / 2}}{\sum_{j=1}^m e^{-\epsilon_p z_j / 2}}
+           \end{align*}
+   \EndFunction
+\end{algorithmic}
+\caption{Parameter tuning}\label{alg:parameter_tuning}
+\end{algorithm}
+
+\Cref{alg:parameter_tuning} splits the dataset $D$ into $m+1$ subsets, and uses
+the last subset as a hold out dataset. Crucially, though, the algorithm defines
+a \textit{utility} function $u(f_i) = -z_i$ as the negation of the number of
+mistakes made by the $i$th minimizer. Notice that the $L_1$ sensitivity of
+$u$, $\Delta u$, is $1$.  From this view, the algorithm uses the exponential
+mechanism and outputs an $f_i$ with probability proportional to
+$\exp(\tfrac{\epsilon_p u(x, r)}{2 \Delta u})$ as in
+\Cref{def:exponential_mechanism}, thus satisfying differential privacy.
+
+Further, \cite{chaudhuri2011differentially} show that the classifier output by
+the above algorithm does not make many more mistakes than the best of the $m$
+classifiers.
+\begin{theorem}
+Let $z_{\text{min}} = \min_i z_i$, and let $z$ be the number of mistakes made on
+$D_{m+1}$ by the classifier output from \Cref{alg:parameter_tuning}. Then, with
+probability $1 - \delta$,
+\begin{align*}
+z \leq z_{\text{min}} + \frac{2 \log(m/\delta)}{\epsilon_p}
+\end{align*}
+\end{theorem}
 \section{Examples}
 In this section, we briefly give examples on how standard learning algorithms fit in this framework.
 	\subsection{Logistic Regression}
