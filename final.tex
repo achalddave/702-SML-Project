@@ -497,6 +497,22 @@ In this section, we briefly give examples on how standard learning algorithms fi
 		For example, the Huber loss is only piecewise doubly differentiable. We slightly modify the proofs by arguing that the set in which the function is not differentiable has measure $0$, and hence does not affect the density ratio in the definition of differential privacy.
 	\end{enumerate}
 
+\section{Implementation Challenges}
+So far, we have seen algorithms that provide strong theoretical guarantees on
+both the privacy afforded to the individuals in a dataset as well and on the
+accuracy of the output. A number of packages have been implemented that expose
+the Laplace mechanism for end users, such as Airavat
+\cite{mohan2012gupt} and GUPT \cite{roy2010airavat}.
+
+In practice, however, the details of the floating point standard can cause
+severe issues in privacy guarantees. In particular, the non-uniform spacing of
+the doubles causes issues in the support of the perturbed output values of the
+Laplace mechanism - the algorithm's output may have support on certain values
+when run on one dataset, but not on another dataset, violating differential
+privacy. \cite{mironov2012significance} describes this issue, and shows that it
+is possible to consistently violate privacy using current implementations of
+Laplace mechanisms, and shows how to overcome these challenges.
+
 \section{Conclusion}
 
 {\small
