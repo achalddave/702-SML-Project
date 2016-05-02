@@ -56,9 +56,6 @@ Jingyan Wang \\
 %\item Further parts in the book.
 %\item Relevant papers from recent conferences.
 %\end{itemize}
-%\item Division of work:
-%
-%We both read the papers above. AD wrote Section 2; JW wrote Section 3.
 %\end{enumerate}
 
 \section{Introduction}
@@ -288,12 +285,43 @@ TODO(achald): Should we write out this proof?
 \end{proof}
 
 \subsubsection{Performance Guarantees}
-We denote $n$ as the number of samples to achieve error $L^* + \epsilon_g$, where $L^*$ is the loss achieved by the predictor $f_0$.
+To analyze the performance guarantees, we compare the loss induced by the output $f_{priv}$ of the algorithm with the loss induced any arbitrary classifier $f_0$. The norm of $f_0$ is included in the sample complexity bound.
+\begin{theorem} Let $f_0$ be any classifier. Let $L$ be the true loss. If $l$ is differentiable and continuous with $c$-Lipschitz derivative $l'$ with $\abs{l'} \le 1$. Then, there exists a constant $C$ \emph{s.t.} when the number of training samples $n$ satifies
+$$n > C\max{\left\{\frac{\norm{f_0}^2 \log{\frac{1}{\delta}}}{\epsilon_g^2}, \frac{d\log{\frac{d}{\delta}}\norm{f_0}^2}{\epsilon_g \epsilon}, \frac{d\log{\frac{d}{\delta}}\sqrt{c} \norm{f_0}^2}{\epsilon_g^{\frac{3}{2}}\epsilon}\right\}},$$
 
-\begin{theorem} (Details omitted for progress report)
-$$n > C\max{\left\{\frac{\norm{f_0}^2 \log{\frac{1}{\delta}}}{\epsilon_g^2}, \frac{d\log{\frac{d}{\delta}}\norm{f_0}^2}{\epsilon_g \epsilon}, \frac{d\log{\frac{d}{\delta}}\sqrt{c} \norm{f_0}^2}{\epsilon_g^{\frac{3}{2}}\epsilon}\right\}}.$$
+the output $f_{priv}$ of Algorithm~\ref{alg:output_perturb} satisfies $P(L(f_{priv}) \le L(f_0) + \epsilon_g) \ge 1 - 2\delta$.
 \end{theorem}
 
+\begin{proof}[Proof sketch]
+Let $\overline{J}(f) = L(f) + \frac{\Lambda}{2} \norm{f}^2$, and let \begin{align*}
+f_{rtr} = \argmin_f \overline{J}(f)\\
+f^* = \argmin_f J(f, D)
+\end{align*}
+
+We decompose the loss as follows:
+\begin{align*}
+L(f_{priv}) -  L(f_0) = [\overline{J}(f_{priv}) - \overline{J}(f_{rtr})] + \left[\overline{J}(f_{rtr}) - \overline{J}(f_0)\right] + \frac{\Lambda}{2} \norm{f_0}^2 - \frac{\Lambda}{2} \norm{f_{priv}}^2
+\end{align*}
+
+For the first term, we first bound the difference between the objective of $f_*$ and that of the differentially-private solution $f_{priv}$:
+\begin{align}
+J(f_{priv}, D) - J(f^*, D) \le \frac{8d^2\log^2{(\frac{d}{\delta})} (c + \Lambda)}{\Lambda^2 n^2 \epsilon_p^2}.\label{thm15:emp}
+\end{align}
+
+Then, applying Theorem 1 of~\cite{sridharan2008objective}, we have
+\begin{align*}
+\overline{J}(f_{priv}) - \overline{J}(f_{rtr}) & \le 2 [J(f_{priv}, D) - J(f^*, D)] + O(\frac{\log{(\frac{1}{\delta})}}{\Lambda n})\\
+& \le  \frac{16d^2\log^2{(\frac{d}{\delta})} (c + \Lambda)}{\Lambda^2 n^2 \epsilon_p^2} + O(\frac{\log{(\frac{1}{\delta})}}{\Lambda n})
+\end{align*}
+The second term $\overline{J}(f_{rtr}) - \overline{J}(f_0) \le 0$.
+
+Setting $\Lambda = \frac{\epsilon_g}{\norm{f_0}^2}$, we obtain
+\begin{align*}
+L(f_{priv}) - L(f_0) \le  \frac{16d^2\log^2{(\frac{d}{\delta})} (c + \Lambda)}{\Lambda^2 n^2 \epsilon_p^2} + O(\frac{\log{(\frac{1}{\delta})}}{\Lambda n}) + \frac{\epsilon_g}{2}.
+\end{align*}
+
+Equating the RHS with $\epsilon_g$ and solving for $n$ complete the proof.
+\end{proof}
 
 \subsection{Objective Perturbation}
 Alternative to perturbing the solution of the algorithm, we can also perturb the objective before optimization. The procedure is given in Algorithm~\ref{alg:obj_perturb}.
@@ -366,10 +394,17 @@ Then, \begin{align}
 \end{proof}
 
 \subsubsection{Performance Guarantees}
-Objective perturbation has a better generalization bound compared to output perturbation.
-\begin{theorem} (Details omitted for progress report)
-$$n > C\max{\left\{ \frac{\norm{f_0}^2 \log{\frac{1}{\delta}}}{\epsilon_g^2}, \frac{c\norm{f_0}^2}{\epsilon_g \epsilon}, \frac{d\log{\frac{d}{\delta}} \norm{f_0}}{\epsilon_g\epsilon}\right\}}.$$
+We follow the same framework as in output perturbation to analyze objective perturbation.
+\begin{theorem}
+Let $f_0$ be any classifier. If $l$ is convex, doubly differentiable with derivative $|l'| \le 1$ and $|l''(z)| \le c$. Then, there exists a constant $C$ \emph{s.t.} when the number of training samples $n$ satifies
+$$n > C\max{\left\{ \frac{\norm{f_0}^2 \log{\frac{1}{\delta}}}{\epsilon_g^2}, \frac{c\norm{f_0}^2}{\epsilon_g \epsilon_p}, \frac{d\log{\frac{d}{\delta}} \norm{f_0}}{\epsilon_g\epsilon}\right\}},$$
+the output $f_{priv}$ of Algorithm~\ref{alg:obj_perturb} satisfies $P(L(f_{priv}) \le L(f_0) + \epsilon_g) \ge 1 - 2\delta$.
 \end{theorem}
+\begin{proof}[Proof sketch]
+The proof is similar to the output perturbation case, where we decompose the loss into three terms. The analysis for $J(f_{priv}, D) - J(f^*, D)$ is different (\emph{cf.} Equation~\eqref{thm15:emp}).
+\end{proof}
+
+Objective perturbation has a better generalization bound compared to output perturbation.
 
 TODO: compare the sample complexity for the two methods in word
 \section{Parameter Tuning}
@@ -403,5 +438,9 @@ In this section, we briefly give examples on how standard learning algorithms fi
 \bibliographystyle{plain}
 \bibliography{proposal}
 }
+\appendix
+\section*{Appendix}
+% Division of work:
+%We both read the papers above. AD wrote Section 2; JW wrote Section 3.
 
 \end{document}
