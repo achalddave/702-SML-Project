@@ -420,20 +420,10 @@ the regularization parameter. In practice, however, it is common to perform a
 sweep over a set of values of $\Lambda$. Usually, we can do this by training
 models with multiple values of $\Lambda$, and evaluating them on a hold-out
 validation set and choosing the value that performs best on the hold-out set.
-However, the following theorem from \cite{dwork2014algorithmic} shows that doing
-so is not differentially private:
-
-\begin{theorem}
-Let $\Mc_1$ be an $\epsilon_1$-differentially private algorithm, and let $\Mc_2$
-be an $\epsilon_2$ differentially private algorithm. Then their combination,
-$\Mc_{1,2}(x) = (\Mc_1(x), \Mc_2(x))$ is $\epsilon_1 + \epsilon_2$
-differentially private.
-\end{theorem}
-
-Thus, running the differentially private ERM algorithms from above for $m$
-different $\Lambda$ values would render the result only
-$(m \epsilon)$-differentially private. So, we need an end to end differentially
-private method for choosing $\Lambda$.
+However, this requires running the algorithm multiple times on the same dataset,
+which can compromise differential privacy by revealing a relationship between
+$\Lambda$ and the output. Instead, we need an end to end differentially private
+method for choosing $\Lambda$.
 
 One simple option to fix this problem is to tune $\Lambda$ on a public dataset
 where privacy is not of concern. Then, using this tuned $\Lambda$, we can use
