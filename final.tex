@@ -280,11 +280,11 @@ TODO(achald): Should we write out this proof?
 \end{proof}
 
 \subsubsection{Performance Guarantees}
-To analyze the performance guarantees, we compare the loss induced by the output $f_{priv}$ of the algorithm with the loss induced any arbitrary classifier $f_0$. The norm of $f_0$ is included in the sample complexity bound.
-\begin{theorem} Let $f_0$ be any classifier. Let $L$ be the true loss. If $l$ is differentiable and continuous with $c$-Lipschitz derivative $l'$ with $\abs{l'} \le 1$. Then, there exists a constant $C$ \emph{s.t.} when the number of training samples $n$ satisfies
+We establish the performance guarantees in the following notion: we compare the loss induced by the differentially-private output $f_{priv}$ with the loss induced any arbitrary classifier $f_0$. We then prove that with a sufficient number of samples, the loss induced by $f_{priv}$ is smaller or arbitrarily close to the loss induced by $f_0$. The term $\norm{f_0}$ is included in the sample complexity bound.
+\begin{theorem} Let $f_0$ be any classifier. Let $L(f) = \Eb_{x, y}\; [l(f^T x, y)]$ be the true loss. Let $l$ be differentiable and continuous, and let $l'$ be $c$-Lipschitz with $\abs{l'} \le 1$. Then, there exists a constant $C$ s.t. when the number of training samples $n$ satisfies
 $$n > C\max{\left\{\frac{\norm{f_0}^2 \log{\frac{1}{\delta}}}{\epsilon_g^2}, \frac{d\log{\frac{d}{\delta}}\norm{f_0}^2}{\epsilon_g \epsilon}, \frac{d\log{\frac{d}{\delta}}\sqrt{c} \norm{f_0}^2}{\epsilon_g^{\frac{3}{2}}\epsilon}\right\}},$$
 
-the output $f_{priv}$ of Algorithm~\ref{alg:output_perturb} satisfies $P(L(f_{priv}) \le L(f_0) + \epsilon_g) \ge 1 - 2\delta$.
+the output $f_{priv}$ of Algorithm~\ref{alg:output_perturb} satisfies $\Pb(L(f_{priv}) \le L(f_0) + \epsilon_g) \ge 1 - 2\delta$.
 \end{theorem}
 
 \begin{proof}[Proof sketch]
