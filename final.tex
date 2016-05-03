@@ -165,20 +165,20 @@ drastically reduced. It can be shown that the exponential mechanism preserves
 $(\epsilon, 0)$ differential privacy.
 
 \section{Differentially-Private Empirical Risk Minimization (ERM)}\label{section:erm}
-In this section, we provide and analyze the differentially-private algorithms for empirical risk minimization (ERM)~\cite{chaudhuri2011erm}.
+In this section, we provide and analyze differentially-private algorithms for empirical risk minimization (ERM)~\cite{chaudhuri2011erm}.
 
 In supervised machine learning, we aim to learn a mapping $f: \X \rightarrow \Y$
 from the training set
 $D = \{(x_i, y_i) \in \X \times \Y\}_{i=1}^n$,
 where $x_i$'s are the data and $y_i$'s are the labels. In the context of our
 notation for differential privacy, our training dataset $D$ is the dataset
-we would like to keep private, and lives in the space
+we would like to keep private, and it lives in the space
 $\Dc^n = \X^n \times \Y^n$.
 
 One way to solve for $f$ is through minimizing the empirical risk:
 \[ f^* = \argmin_{f\in \F} R(f, D)
-       = \argmin_{f\in \F} \frac{1}{n} \sum_{i=1}^n l(f(x_i), y_i) + \Lambda N(f), \]
-where $\F$ is a function class. The function $l:\Y \times \Y \rightarrow \R$ is
+       = \argmin_{f\in \F} \frac{1}{n} \sum_{i=1}^n \ell(f(x_i), y_i) + \Lambda N(f), \]
+where $\F$ is a function class. The function $\ell:\Y \times \Y \rightarrow \R$ is
 a loss function. $N(\cdot)$ is a regularizer which penalizes the complexity of
 $f$, and $\Lambda$ is a tuning parameter. In the remaining of the report, we
 consider the classification problem with a linear predictor $f(x) = f^T x$ where
@@ -189,10 +189,10 @@ hyperplane is highly sensitive to the training examples near the margin. Adding
 or removing a training example near the margin can drastically change the
 hyperplane, revealing certain properties of these individuals.
 
-The idea is to add noise to perturb the output. In the SVM example, it will then become impossible to identify if certain training examples on the margin contribute to the hyperplane, or merely the noise. We use the Laplace mechanism and exponential mechanism in Section~\ref{overview} as building blocks, and discuss two approaches: (1) \emph{output perturbation}: to obtain the predictor $\hat{f}$ by solving the original ERM and then perturb $\hat{f}$ (2) \emph{objective perturbation}: to perturb the ERM objective $R(f, \Dc)$ and then solve for the predictor $\hat{f}$ from the perturbed objective.
+The idea is to add noise to perturb the output. In the SVM example, it will then become impossible to identify if certain training examples on the margin contribute to the hyperplane, or merely the noise. We use the Laplace mechanism and exponential mechanism in Section~\ref{overview} as building blocks, and discuss two approaches: (1) \emph{output perturbation}: to obtain the predictor $\hat{f}$ by solving the original ERM and then perturbing $\hat{f}$ (2) \emph{objective perturbation}: to perturb the ERM objective $R(f, \Dc)$ and then solve for the predictor $\hat{f}$ that minimizes the perturbed objective.
 
 \subsection{Output Perturbation}
-In output perturbation, we solve the ERM and perturb the solution using the Laplace mechanism. The procedure is given in Algorithm~\ref{alg:output_perturb}.
+In output perturbation, we solve the ERM problem and perturb the solution using the Laplace mechanism. The procedure is given in Algorithm~\ref{alg:output_perturb}.
 
 \begin{algorithm}[htb]
 \begin{algorithmic}[1]
@@ -207,7 +207,7 @@ In output perturbation, we solve the ERM and perturb the solution using the Lapl
 
 \subsubsection{Privacy Guarantees}
 \begin{theorem}
-If $N$ is differentiable and $1$-strongly convex; $l$ is convex and differentiable with $\abs{l'} \le 1$, then Algorithm~\ref{alg:output_perturb} is $\epsilon$-differentially private.
+If $N$ is differentiable and $1$-strongly convex; $\ell$ is convex and differentiable with $\abs{\ell'} \le 1$, then Algorithm~\ref{alg:output_perturb} is $\epsilon$-differentially private.
 \end{theorem}
 
 \begin{proof}
