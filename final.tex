@@ -233,12 +233,12 @@ Since we draw $\norm{b}$ from Lap$(\frac{1}{\beta})$, then the density for
 any fixed $b_0$ is proportional to $\exp(-\beta \norm{b_0})$. Then,
 \begin{align*}
 \frac{g(f | D)}{g(f | D')}
-    &= \frac{
+    = \frac{
          \exp(-\tfrac{n\Lambda\epsilon_p}{2} \norm{b + f_1})
        }{
          \exp(-\tfrac{n\Lambda\epsilon_p}{2} \norm{b + f_2})
-       } \\
-    &\leq \exp(-\tfrac{n\Lambda\epsilon_p}{2} \norm{f_2 - f_1})
+       }
+    \leq \exp(-\tfrac{n\Lambda\epsilon_p}{2} \norm{f_2 - f_1})
 \end{align*}
 
 From \Cref{cor:output_perturb_sensitivity}, we know that the $L_2$ sensitivity
@@ -292,11 +292,9 @@ convex. If $f_1 = \argmin_f G(f)$, and $f_2 = \argmin_f G(f) + g(f)$, then
 \begin{align*}
 \norm{f_1 - f_2} \leq \frac{1}{\lambda} \max_f \norm{\nabla g(f)}
 \end{align*}
+(Proof omitted for brevity; see \cite{chaudhuri2011erm} for details.)
 \label{lemma:strong_convex_sensitivity}
 \end{lemma}
-\begin{proof}
-Omitted for brevity. See \cite{chaudhuri2011erm} for details.
-\end{proof}
 
 \subsubsection{Performance Guarantees}
 We establish the performance guarantees in the following notion: we compare the loss induced by the differentially-private output $f_{priv}$ with the loss induced any arbitrary classifier $f_0$. We then prove that with a sufficient number of samples, the loss induced by $f_{priv}$ is smaller or arbitrarily close to the loss induced by $f_0$. The term $\norm{f_0}$ is included in the sample complexity bound.
