@@ -74,62 +74,59 @@ technique and specific examples of ERM (\emph{e.g.} logistic regression, SVM)
 are also discussed.
 
 \section{Overview}\label{overview}
-The notion of differential privacy~\cite{dwork2006calibrating} was first developed by Dwork \emph{et al} as follows.
+The notion of differential privacy~\cite{dwork2006calibrating} was first
+developed by Dwork \emph{et al} as follows.
 
 %% CLEAN-UP START FROM HERE
 
-We consider datasets that are collections of records from some
-universe $\mathcal{X}$. Further, we can represent such a dataset $x$ as a
-\textit{histogram} of records, so that $x \in \mathbb{N}^{\abs{\X}}$. If we want
-to collect a dataset where we ask people to say whether they smoke or not, the
-universe of responses is $\mathcal{X} = \{0, 1\}$, and the histogram
-representation is simply a count of the number of people who smoke and the
-number of people who do not smoke.
+We consider datasets that are collections of records from some universe $\Dc$.
+For example, if we want to collect a dataset where we ask people to say whether
+they smoke or not, the universe of responses is $\Dc = \{0, 1\}$. Further,
+denote $\Dc^n$ to be the space of datasets containing $n$ entries from $\Dc$.
 
 We would like to answer \textit{queries} from datasets while preserving some
-notion of privacy. We let $\mathcal{M}$ be a mechanism for answering
+notion of privacy. We denote $\Mc$ to be a mechanism for answering
 queries. To preserve privacy, we want the response of this mechanism
 to have a similar distribution regardless of any one individual's response.
-That is, we want that for two datasets $x, y$ that differ in only one
-individual (that is, $\norm{x - y}_1 \leq 1$), the distribution of
-$\mathcal{M}(x)$ is close to $\mathcal{M}(y)$.
+That is, we want that for two datasets $D, D'$ that differ in only one
+individual (denoted $D \sim D'$), the distribution of $\Mc(D)$ is close to
+$\Mc(D')$.
 
-With this notation, we can formalize $(\epsilon, \delta)$-differential privacy~\cite{dwork2014algorithmic}.
+With this notation, we can formalize $(\epsilon, \delta)$-differential
+privacy~\cite{dwork2014algorithmic} as follows:
 
 \begin{definition}{(Differential Privacy)}
-A random mechanism $\mathcal{M}$ is $(\epsilon, \delta)$-differentially private
-if for all $\mathcal{S} \subseteq \textrm{Range}(\mathcal{M})$ and for all
-datasets $x, y \in \mathbb{N}^{\abs{\mathcal{X}}}$
-such that $\norm{x - y}_1 \leq 1$,
+A random mechanism $\Mc$ is $(\epsilon, \delta)$-differentially private
+if for all $\Sc \subseteq \textup{Range}(\Mc)$ and for all
+datasets $D, D' \in \Dc^n$ such that $D \sim D'$.
 \begin{align*}
-P(\mathcal{M}(x) \in \mathcal{S}) \leq \exp{(\epsilon)} P(\mathcal{M}(y) \in \mathcal{S}) + \delta
+P(\Mc(D) \in \Sc) \leq \exp{(\epsilon)} P(\Mc(D') \in \Sc) + \delta
 \end{align*}
 \end{definition}
 
 A simple, intuitive way of ensuring differential privacy is to add noise to the
 output of queries. Suppose a query
-\[ f(x) : \mathbb{N}^{\abs{\mathcal{X}}} \rightarrow \mathbb{R}^k \]
-is requested. Then, instead of
-returning $f(X)$, we can return $f(x) + (Y_1, \dots, Y_k)$, where $Y_i$ is noise
-drawn from some distribution. However, the noise must depend, in some sense, on
-how much $f$ can change for values of $x, y$ close to each other.
+\[ f(D) : \Dc^n \rightarrow \mathbb{R}^k \]
+is requested. Then, instead of returning $f(D)$, we can return
+$f(D) + (Y_1, \dots, Y_k)$, where $Y_i$ is noise drawn from some distribution.
+However, the noise must depend, in some sense, on how much $f$ can change for
+values of $D, D'$ close to each other.
 
 We can formalize this as follows. Define $\Delta f$, the $L_1$-sensitivity of
 $f$, as follows:
 \begin{align*}
-\Delta f = \max_{\substack{x, y \in \Nb^{\abs{\Xc}} \\ \norm{x - y}_1 = 1}}
-                \norm{f(x) - f(y)}_1
+\Delta f = \max_{D \sim D'} \norm{f(D) - f(D')}_1,
 \end{align*}
 
 If $f$ is highly sensitive, then we will need to add more noise to prevent an
-adversary from distinguishing $x$ or $y$ based on $f(x)$ and $f(y)$. It turns
+adversary from distinguishing $D$ or $D'$ based on $f(D)$ and $f(D')$. It turns
 out that we can use what is known as the Laplace mechanism to do this.
 
 \begin{definition}{(Laplace Mechanism)}
-For any function $f : \Nb^{\abs{\Xc}} \rightarrow \Rb^k$ with $L_1$-sensitivity
+For any function $f : \Dc^n \rightarrow \Rb^k$ with $L_1$-sensitivity
 $\Delta f$, the Laplace mechanism is defined as
 \begin{align*}
-\Mc_L(x, f(\cdot), \epsilon) = f(x) + (Y_1, \dots, Y_k)
+\Mc_L(D, f(\cdot), \epsilon) = f(D) + (Y_1, \dots, Y_k)
 \end{align*}
 where $Y_i$ are i.i.d. drawn from Lap($\Delta f / \epsilon$).
 \label{def:laplace_mechanism}
@@ -141,25 +138,25 @@ privacy. Note that this mechanism adds noise to the response of the query.
 In some cases, adding noise to the response of a query can drastically lower
 the utility of the response. In this case, we can instead consider the
 exponential mechanism, which allows specifying a utility function for responses.
-
-Define a utility function $u : \Nb^{\abs{\Xc}} \times \Rc \rightarrow \Rb$,
+Let $\Rc$ be the space of possible responses for a given query. Then, we can
+define define a utility function $u : \Dc^n \times \Rc \rightarrow \Rb$,
 which assigns a utility to a response for a given database. Similar to the
 sensitivity of $f$, let's define the sensitivity of $u$:
 \begin{align*}
-\Delta u \triangleq \max_{r \in \Rc} \max_{x, y : \norm{x - y}_1 \leq 1} \abs{u(x, r) - u(y, r)}
+\Delta u \triangleq \max_{r \in \Rc} \max_{D \sim D'} \abs{u(D, r) - u(D', r)}
 \end{align*}
 
-For this utility function, the exponential mechanism is defined as follows
+For this utility function, the exponential mechanism is defined as follows:
 \begin{definition}{(Exponential Mechanism)}
-The exponential mechanism $\Mc_E(x, u, \Rc)$ outputs an element $r \in \Rc$ with
-probability proportional to $\exp{(\frac{\epsilon u(x, r)}{2 \Delta u})}$.
+The exponential mechanism $\Mc_E(D, u, \Rc)$ outputs an element $r \in \Rc$ with
+probability proportional to $\exp{(\frac{\epsilon u(D, r)}{2 \Delta u})}$.
 \label{def:exponential_mechanism}
 \end{definition}
 
 Unlike the Laplace mechanism, the exponential mechanism doesn't add arbitrary
-noise to the response; instead, it simply randomizes \textit{which} of a set of
-responses to return, so that the utility is not drastically reduced with high
-probability. It can be shown that the exponential mechanism preserves
+noise to the response; instead, it randomly selects \textit{which} of a set of
+responses to return, so that, with high probability, the utility is not
+drastically reduced. It can be shown that the exponential mechanism preserves
 $(\epsilon, 0)$ differential privacy.
 
 \section{Privacy-Preserving Machine Learning}\label{section:erm}
