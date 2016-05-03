@@ -106,29 +106,29 @@ P(\Mc(D) \in \Sc) \leq \exp{(\epsilon)} P(\Mc(D') \in \Sc) + \delta
 
 A simple, intuitive way of ensuring differential privacy is to add noise to the
 output of queries. Suppose a query
-\[ f(D) : \Dc^n \rightarrow \mathbb{R}^k \]
-is requested. Then, instead of returning $f(D)$, we can return
-$f(D) + (Y_1, \dots, Y_k)$, where $Y_i$ is noise drawn from some distribution.
-However, the noise must depend, in some sense, on how much $f$ can change for
+\[ q(D) : \Dc^n \rightarrow \mathbb{R}^k \]
+is requested. Then, instead of returning $q(D)$, we can return
+$q(D) + (Y_1, \dots, Y_k)$, where $Y_i$ is noise drawn from some distribution.
+However, the noise must depend, in some sense, on how much $q$ can change for
 values of $D, D'$ close to each other.
 
-We can formalize this as follows. Define $\Delta f$, the $L_1$-sensitivity of
-$f$, as follows:
+We can formalize this as follows. Define $\Delta q$, the $L_1$-sensitivity of
+$q$, as follows:
 \begin{align*}
-\Delta f = \max_{D \sim D'} \norm{f(D) - f(D')}_1,
+\Delta q = \max_{D \sim D'} \norm{q(D) - q(D')}_1,
 \end{align*}
 
-If $f$ is highly sensitive, then we will need to add more noise to prevent an
-adversary from distinguishing $D$ or $D'$ based on $f(D)$ and $f(D')$. It turns
+If $q$ is highly sensitive, then we will need to add more noise to prevent an
+adversary from distinguishing $D$ or $D'$ based on $q(D)$ and $q(D')$. It turns
 out that we can use what is known as the Laplace mechanism to do this.
 
 \begin{definition}{(Laplace Mechanism)}
-For any function $f : \Dc^n \rightarrow \Rb^k$ with $L_1$-sensitivity
-$\Delta f$, the Laplace mechanism is defined as
+For any function $q : \Dc^n \rightarrow \Rb^k$ with $L_1$-sensitivity
+$\Delta q$, the Laplace mechanism is defined as
 \begin{align*}
-\Mc_L(D, f(\cdot), \epsilon) = f(D) + (Y_1, \dots, Y_k)
+\Mc_L(D, q(\cdot), \epsilon) = q(D) + (Y_1, \dots, Y_k)
 \end{align*}
-where $Y_i$ are i.i.d. drawn from Lap($\Delta f / \epsilon$).
+where $Y_i$ are drawn i.i.d. from Lap($\Delta q / \epsilon$).
 \label{def:laplace_mechanism}
 \end{definition}
 
@@ -141,7 +141,7 @@ exponential mechanism, which allows specifying a utility function for responses.
 Let $\Rc$ be the space of possible responses for a given query. Then, we can
 define define a utility function $u : \Dc^n \times \Rc \rightarrow \Rb$,
 which assigns a utility to a response for a given database. Similar to the
-sensitivity of $f$, let's define the sensitivity of $u$:
+sensitivity of $q$, let's define the sensitivity of $u$:
 \begin{align*}
 \Delta u \triangleq \max_{r \in \Rc} \max_{D \sim D'} \abs{u(D, r) - u(D', r)}
 \end{align*}
