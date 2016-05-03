@@ -36,12 +36,6 @@ Jingyan Wang \\
 \begin{document}
 
 \maketitle
-%\item What we have done so far:
-%
-%We read part of the book~\cite{dwork2014algorithmic} for the background and introduction. We read~\cite{chaudhuri2011erm} on differential privacy in machine learning.
-%\item What remains to be done:
-%
-%We plan to scrutinize and summarize the proof ideas in~\cite{chaudhuri2011erm}.
 %
 %We also plan to survey and read a few more papers. The options include:
 %\begin{itemize}
@@ -66,13 +60,12 @@ queries that reveal aggregated statistics about the dataset as a whole. Revisiti
 We survey the prior works on differential privacy, with an emphasis on empirical risk minimization (ERM). Section~\ref{overview} introduces the fundamental concepts and basic properties. Section~\ref{section:erm} discusses two algorithms for empirical risk minimization and considers the tradeoffs between privacy guarantees and generalization performance. The parameter tuning technique and specific examples of ERM (\emph{e.g.} logistic regression, SVM) are also discussed.
 
 % Reading List
-% Some broad motivation for the need for differential privacy. \cite{narayanan2008robust}
-% Fundamentals of differential privacy from excerpts of a book. \cite{dwork2014algorithmic}
 % A survey of differential privacy results. \cite{dwork2008differential}
-% Applications of differential privacy in empirical risk minimization, which include logistic regression and SVM.~\cite{chaudhuri2011differentially} If time permits, papers from recent conferences.
 
 \section{Overview}\label{overview}
-The notion of differential privacy~\cite{dwork2006calibrating} was first developed by Dwork \emph{et al}.
+The notion of differential privacy~\cite{dwork2006calibrating} was first developed by Dwork \emph{et al} as follows.
+
+%% CLEAN-UP START FROM HERE
 
 We consider datasets that are collections of records from some
 universe $\mathcal{X}$. Further, we can represent such a dataset $x$ as a
@@ -90,7 +83,7 @@ That is, we want that for two datasets $x, y$ that differ in only one
 individual (that is, $\norm{x - y}_1 \leq 1$), the distribution of
 $\mathcal{M}(x)$ is close to $\mathcal{M}(y)$.
 
-With this notation, we can formalize $(\epsilon, \delta)$-differential privacy.
+With this notation, we can formalize $(\epsilon, \delta)$-differential privacy~\cite{dwork2014algorithmic}.
 
 \begin{definition}{(Differential Privacy)}
 A random mechanism $\mathcal{M}$ is $(\epsilon, \delta)$-differentially private
@@ -482,11 +475,11 @@ In this section, we briefly give examples on how standard learning algorithms fi
 		For example, the Huber loss is only piecewise doubly differentiable. We slightly modify the proofs by arguing that the set in which the function is not differentiable has measure $0$, and hence does not affect the density ratio in the definition of differential privacy.
 	\end{enumerate}
 
-\section{Discussions and Conclusion}
+\section{Discussions}
 
 We have discussed the definition of differential privacy as well as a couple of
 ways to ensure differential privacy for general queries. Further, we showed the
-applications of these mechanisms for Empirical Risk Minimization, so that we
+applications of these mechanisms for empirical risk minimization, so that we
 are able to train classifiers on datasets in a differentially private manner.
 As we look further into providing privacy in the real world, we must consider
 additional challenges as well as alternative definitions of privacy.
@@ -504,7 +497,7 @@ information to a statistician who queries the dataset. \cite{duchi2013local}
 discuss this setting of \textit{local} differential privacy, and, critically,
 show that for many statistical procedures, the effective sample size under
 $\alpha$-local differential privacy with $n$ data points in $d$ dimensions is
-reduced to $n \alpha^2 / d$. This reduction can lead to drastically poor
+reduced to $n \alpha^2 / d$ from $n$, where $\alpha < 1$. This reduction can lead to drastically poor
 estimation results, and shows that providing local differential privacy can be
 very costly in terms of the accuracy of query results.
 
@@ -523,7 +516,8 @@ privacy.  \cite{mironov2012significance} describes this issue, and shows that it
 is possible to consistently violate privacy using current implementations of
 Laplace mechanisms, and shows how to overcome these challenges.
 
-\textbf{Conclusion.} Despite these challenges facing privacy, it is possible to
+\section{Conclusion}
+Despite these challenges facing privacy, it is possible to
 provide strong theoretical guarantees in the case of standard differential
 privacy for both privacy and performance. This survey, in addition to providing
 an overview of differential privacy, discusses methods for performing empirical
