@@ -36,13 +36,6 @@ Jingyan Wang \\
 \begin{document}
 
 \maketitle
-
-%\section{Logistics}
-%
-%\begin{enumerate}[label=(\roman*)]
-%\item Introduction:
-%
-%Please see Section 1 and 2.
 %\item What we have done so far:
 %
 %We read part of the book~\cite{dwork2014algorithmic} for the background and introduction. We read~\cite{chaudhuri2011erm} on differential privacy in machine learning.
@@ -55,30 +48,22 @@ Jingyan Wang \\
 %\item Privacy attack approaches when databases are not protected by differential privacy, \emph{e.g.}~\cite{ganta2008composition}.
 %\item Further parts in the book.
 %\item Relevant papers from recent conferences.
-%\end{itemize}
-%\end{enumerate}
+
 
 \section{Introduction}
-The growth of the internet and electronic databases has led to an
-increasing concern about the privacy of users' information. These databases
-enable researchers to learn information, such as
-identifying new trends or learning to recommend movies, from large
-groups of people. Although increasingly useful, these methods come at the cost
-of users' privacy: as we ask questions about a large dataset of users'
+The growth of the Internet and electronic databases has led to an
+increasing concern about the privacy of user information. These databases
+facilitate researchers to analyze patterns from large groups of people and develop machine learning algorithms, such as
+identifying trends or recommending movies. Although increasingly useful, these methods come at the cost
+of user privacy: as we ask questions about a large dataset of users'
 information, we receive information of not only the group, but also of
-individual users. Prior work \cite{narayanan2008robust, sweeney1997weaving,
-ganta2008composition} has shown that even anonymous datasets can reveal
-sensitive details about individuals.
+individual users. Prior work has theoretically~\cite{ganta2008composition} and empirically~\cite{sweeney1997weaving} demonstrated that even anonymous datasets can reveal
+sensitive details about individuals. For example, \cite{narayanan2008robust} has shown that individual subscribers in the Netflix Prize dataset can be accurately identified with a minimal amount of auxiliary public information. 
 
-Differential privacy aims to provide provable privacy for users, while allowing
-queries that reveal details about the dataset as a whole. Combining differential
-privacy and machine learning methods have been giving rise to new algorithms and
-new theoretical guarantees.
+Differential privacy offers a formal paradigm which guarantees provable privacy for users, while allowing
+queries that reveal aggregated statistics about the dataset as a whole. Revisiting machine learning problems with this notation of differential privacy has been giving rise to lots of new algorithms and theoretical guarantees.
 
-In this project, we survey the fundamental concepts about differential privacy,
-and discuss approaches for performing empirical risk minimization while
-maintaining privacy, and consider the tradeoffs between the algorithms as well
-as the tradeoffs between performance and privacy.
+We survey the prior works on differential privacy, with an emphasis on empirical risk minimization (ERM). Section~\ref{overview} introduces the fundamental concepts and basic properties. Section~\ref{section:erm} discusses two algorithms for empirical risk minimization and considers the tradeoffs between privacy guarantees and generalization performance. The parameter tuning technique and specific examples of ERM (\emph{e.g.} logistic regression, SVM) are also discussed.
 
 % Reading List
 % Some broad motivation for the need for differential privacy. \cite{narayanan2008robust}
@@ -87,7 +72,7 @@ as the tradeoffs between performance and privacy.
 % Applications of differential privacy in empirical risk minimization, which include logistic regression and SVM.~\cite{chaudhuri2011differentially} If time permits, papers from recent conferences.
 
 \section{Overview}\label{overview}
-We first formalize the notion of differential privacy, following~\cite{dwork2014algorithmic}.
+The notion of differential privacy~\cite{dwork2006calibrating} was first developed by Dwork \emph{et al}.
 
 We consider datasets that are collections of records from some
 universe $\mathcal{X}$. Further, we can represent such a dataset $x$ as a
@@ -173,7 +158,7 @@ responses to return, so that the utility is not drastically reduced with high
 probability. It can be shown that the exponential mechanism preserves
 $(\epsilon, 0)$ differential privacy.
 
-\section{Privacy-Preserving Machine Learning}
+\section{Privacy-Preserving Machine Learning}\label{section:erm}
 In this section, we discuss how to preserve differential privacy during the learning procedure~\cite{chaudhuri2011erm}.
 
 We consider the standard supervised learning setting, where we aim to learn a mapping $f: \X \rightarrow \Y$ from the training data $D = \{(x_i, y_i) \in \X \times \Y\}_{i=1}^n$. One way to solve for such a function $f$ is through empirical risk minimization (ERM):
