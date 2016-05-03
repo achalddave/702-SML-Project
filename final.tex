@@ -146,10 +146,12 @@ sensitivity of $q$, let's define the sensitivity of $u$:
 \Delta u \triangleq \max_{r \in \Rc} \max_{D \sim D'} \abs{u(D, r) - u(D', r)}
 \end{align*}
 
-For this utility function, the exponential mechanism is defined as follows:
+Then, the exponential mechanism is defined as follows:
 \begin{definition}{(Exponential Mechanism)}
-The exponential mechanism $\Mc_E(D, u, \Rc)$ outputs an element $r \in \Rc$ with
-probability proportional to $\exp{(\frac{\epsilon u(D, r)}{2 \Delta u})}$.
+For any utility function $u : \Dc^n \times \Rc \rightarrow \Rb$ with $L_1$
+sensitivity $\Delta u$, the exponential mechanism $\Mc_E(D, u, \Rc)$ outputs an
+element $r \in \Rc$ with probability proportional to $\exp{(\frac{\epsilon u(D,
+r)}{2 \Delta u})}$.
 \label{def:exponential_mechanism}
 \end{definition}
 
@@ -162,11 +164,27 @@ $(\epsilon, 0)$ differential privacy.
 \section{Differentially-Private Empirical Risk Minimization (ERM)}\label{section:erm}
 In this section, we provide and analyze the differentially-private algorithms for empirical risk minimization (ERM)~\cite{chaudhuri2011erm}.
 
-In supervised machine learning, we aim to learn a mapping $f: \X \rightarrow \Y$ from the training set $\Dc = \{(x_i, y_i) \in \X \times \Y\}_{i=1}^n$, where $x_i$'s are the data and $y_i$'s are the labels. One way to solve for $f$ is through minimizing the empirical risk:
-$$f^* = \argmin_{f\in \F} R(f, \Dc) \ =\argmin_{f\in \F} \frac{1}{n}\sum_{i=1}^n l(f(x_i), y_i) + \Lambda N(f),$$
-where $\F$ is a function class. The function $l:\Y \times \Y \rightarrow \R$ is a loss function. $N(\cdot)$ is a regularizer which penalizes the complexity of $f$, and $\Lambda$ is a tuning parameter. In the remaining of the report, we consider the classification problem with a linear predictor $f(x) = f^T x$ where $f\in \R^d$.
+In supervised machine learning, we aim to learn a mapping $f: \X \rightarrow \Y$
+from the training set
+$D = \{(x_i, y_i) \in \X \times \Y\}_{i=1}^n$,
+where $x_i$'s are the data and $y_i$'s are the labels. In the context of our
+notation for differential privacy, our training dataset $D$ is the dataset
+we would like to keep private, and lives in the space
+$\Dc^n = \X^n \times \Y^n$.
 
-The output $f$ is not differentially private. For example, in SVM, the hyperplane is highly sensitive to the training examples near the margin. Adding or removing a training example near the margin can drastically change the hyperplane, revealing certain properties of these individuals.
+One way to solve for $f$ is through minimizing the empirical risk:
+\[ f^* = \argmin_{f\in \F} R(f, D)
+       = \argmin_{f\in \F} \frac{1}{n} \sum_{i=1}^n l(f(x_i), y_i) + \Lambda N(f), \]
+where $\F$ is a function class. The function $l:\Y \times \Y \rightarrow \R$ is
+a loss function. $N(\cdot)$ is a regularizer which penalizes the complexity of
+$f$, and $\Lambda$ is a tuning parameter. In the remaining of the report, we
+consider the classification problem with a linear predictor $f(x) = f^T x$ where
+$f\in \R^d$.
+
+The output $f$ is not differentially private. For example, in SVM, the
+hyperplane is highly sensitive to the training examples near the margin. Adding
+or removing a training example near the margin can drastically change the
+hyperplane, revealing certain properties of these individuals.
 
 The idea is to add noise to perturb the output. In the SVM example, it will then become impossible to identify if certain training examples on the margin contribute to the hyperplane, or merely the noise. We use the Laplace mechanism and exponential mechanism in Section~\ref{overview} as building blocks, and discuss two approaches: (1) \emph{output perturbation}: to obtain the predictor $\hat{f}$ by solving the original ERM and then perturb $\hat{f}$ (2) \emph{objective perturbation}: to perturb the ERM objective $R(f, \Dc)$ and then solve for the predictor $\hat{f}$ from the perturbed objective.
 
@@ -175,8 +193,8 @@ In output perturbation, we solve the ERM and perturb the solution using the Lapl
 
 \begin{algorithm}[htb]
 \begin{algorithmic}[1]
-  \Function{Output Perturbation}{dataset $\Dc$, differential privacy $\epsilon$, regularization $\Lambda$}
-    \State Solve $\hat{f} = \argmin_f R(f, \Dc)$.
+  \Function{Output Perturbation}{dataset $D$, differential privacy $\epsilon$, regularization $\Lambda$}
+    \State Solve $\hat{f} = \argmin_f R(f, D)$.
     \State Draw a random vector $b\in \R^d, \norm{b}\sim \text{Lap}(\frac{1}{\beta})$, where $\beta = \frac{n\Lambda \epsilon}{2}$.
     \State Return $f_{priv} = \hat{f} + b$
    \EndFunction
@@ -192,7 +210,7 @@ If $N$ is differentiable and $1$-strongly convex; $l$ is convex and differentiab
 \begin{proof}
 This method is very similar to the Laplace mechanism in \Cref{def:laplace_mechanism}.
 
-Let $h(\Dc) = \argmin_f R(f, \Dc)$, which is just a query on a dataset that
+Let $h(D) = \argmin_f R(f, D)$, which is just a query on a dataset that
 returns some value. From \Cref{cor:output_perturb_sensitivity}, we know that
 $\Delta_2 h$, the $L_2$ sensitivity of $h$, is $\frac{n \Lambda}{2}$. Then,
 \Cref{alg:output_perturb} is similar to the Laplace mechanism from
@@ -259,7 +277,7 @@ Since $y_i \in [-1, 1], \abs{L'(z)} \leq 1$ for all $z$, and
 $\norm{x_i} \leq 1$, we can see that for any $f$,
 \begin{align*}
 \norm{\nabla g(f)} \leq \frac{2}{n}
-\end{align*}.
+\end{align*}
 
 We can now appeal to \Cref{lemma:strong_convex_sensitivity} to conclude the
 proof.
