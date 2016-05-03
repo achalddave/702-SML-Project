@@ -261,19 +261,19 @@ Let
 \begin{align*}
 G(f) &= J(f, D) \\
 g(f) &= J(f, D') - J(f, D) \\
-     &= \frac{1}{n} (L(y_n' f^T x_n') - L(y_n f^T x_n)).
+     &= \frac{1}{n} (\ell(y_n' f^T x_n') - \ell(y_n f^T x_n)).
 \end{align*}
 
-By the convexity of $L$ and the $1$-strong convexity of $N(\dot)$, we know that
+By the convexity of $\ell$ and the $1$-strong convexity of $N(\dot)$, we know that
 $J(f, D)$ is $\Lambda-$strongly convex, and therefore, so are $G(f)$ and
 $G(f) + g(f)$.
 Further,
 \begin{align*}
 \nabla g(f)
-= \frac{1}{n} \left(y_n' L'(y_n' f^T x_n') x_n' - y_n L'(y_n f^T x_n) x_n\right)
+= \frac{1}{n} \left(y_n' \ell'(y_n' f^T x_n') x_n' - y_n \ell'(y_n f^T x_n) x_n\right)
 \end{align*}
 
-Since $y_i \in [-1, 1], \abs{L'(z)} \leq 1$ for all $z$, and
+Since $y_i \in [-1, 1], \abs{\ell'(z)} \leq 1$ for all $z$, and
 $\norm{x_i} \leq 1$, we can see that for any $f$,
 \begin{align*}
 \norm{\nabla g(f)} \leq \frac{2}{n}
