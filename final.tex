@@ -318,19 +318,19 @@ L(f_{priv}) -  L(f_0) = [\overline{J}(f_{priv}) - \overline{J}(f_{rtr})] + \left
 
 For the first term, we first bound the difference between the (empirical) objective of $f_*$ and that of the differentially-private solution $f_{priv}$, by the conditions $\norm{x_i} \le 1, \abs{y_i} \le 1$:
 \begin{align}
-J(f_{priv}, D) - J(f^*, D) \le \frac{8d^2\log^2{(\frac{d}{\delta})} (c + \Lambda)}{\Lambda^2 n^2 \epsilon_p^2}.\label{thm15:emp}
+J(f_{priv}, D) - J(f^*, D) \le \frac{8d^2\log^2{(\frac{d}{\delta})} (c + \Lambda)}{\Lambda^2 n^2 \epsilon^2}.\label{thm15:emp}
 \end{align}
 
 Then, we apply Theorem 1 of~\cite{sridharan2008objective} and have:
 \begin{align*}
 \overline{J}(f_{priv}) - \overline{J}(f_{rtr}) & \le 2 [J(f_{priv}, D) - J(f^*, D)] + O(\frac{\log{(\frac{1}{\delta})}}{\Lambda n})\\
-& \le  \frac{16d^2\log^2{(\frac{d}{\delta})} (c + \Lambda)}{\Lambda^2 n^2 \epsilon_p^2} + O(\frac{\log{(\frac{1}{\delta})}}{\Lambda n})
+& \le  \frac{16d^2\log^2{(\frac{d}{\delta})} (c + \Lambda)}{\Lambda^2 n^2 \epsilon^2} + O(\frac{\log{(\frac{1}{\delta})}}{\Lambda n})
 \end{align*}
 For the second term, by definition of $f_{rtr}$, we have $\overline{J}(f_{rtr}) - \overline{J}(f_0) \le 0$.
 
 Setting $\Lambda = \frac{\epsilon_g}{\norm{f_0}^2}$ in the three terms, we obtain:
 \begin{align*}
-L(f_{priv}) - L(f_0) \le  \frac{16\norm{f_0}^4 d^2\log^2{(\frac{d}{\delta})} (c +\frac{\epsilon_g}{\norm{f_0}^2})}{n^2 \epsilon_g^2\epsilon_p^2} + O(\norm{f_0}^2\frac{\log{(\frac{1}{\delta})}}{n\epsilon_g}) + \frac{\epsilon_g}{2}.
+L(f_{priv}) - L(f_0) \le  \frac{16\norm{f_0}^4 d^2\log^2{(\frac{d}{\delta})} (c +\frac{\epsilon_g}{\norm{f_0}^2})}{n^2 \epsilon_g^2\epsilon^2} + O(\norm{f_0}^2\frac{\log{(\frac{1}{\delta})}}{n\epsilon_g}) + \frac{\epsilon_g}{2}.
 \end{align*}
 
 Equating the RHS with $\epsilon_g$ and solving for $n$ complete the proof.
@@ -384,7 +384,7 @@ From~\eqref{thm9:b}, we analytically compute and bound the ratio of the Jacobian
 \begin{align*}\frac{\abs{\det(J(f_{priv} \rightarrow b | D))}^{-1}}{\abs{\det(J(f_{priv} \rightarrow b' | D'))}^{-1}} \le \left(1 + \frac{c}{n(\Lambda + \Delta)}\right)^2
 \end{align*}
 
-We want to bound this term by $e^{\epsilon - \epsilon'}$, so in the first case, we directly set $\epsilon' = \epsilon  - \log{(1 + \frac{c}{n\Lambda})^2}$, and $\Delta = 0$ if $\epsilon' > 0$. In the second case, we address the case when $\epsilon'$ becomes negative, and reset $\epsilon_p' = \frac{\epsilon}{2}$ and $\Delta = \frac{c}{n(e^{\frac{\epsilon}{4}}- 1)}- \Lambda$. We can verify that falling into the second case implies $\Delta > 0$. Hence,
+We want to bound this term by $e^{\epsilon - \epsilon'}$, so in the first case, we directly set $\epsilon' = \epsilon  - \log{(1 + \frac{c}{n\Lambda})^2}$, and $\Delta = 0$ if $\epsilon' > 0$. In the second case, we address the case when $\epsilon'$ becomes negative, and reset $\epsilon' = \frac{\epsilon}{2}$ and $\Delta = \frac{c}{n(e^{\frac{\epsilon}{4}}- 1)}- \Lambda$. We can verify that falling into the second case implies $\Delta > 0$. Hence,
 \begin{align}
 \frac{\abs{\det(J(f_{priv} \rightarrow b | D))}^{-1}}{\abs{\det(J(f_{priv} \rightarrow b' | D'))}^{-1}} \le e^{\epsilon - \epsilon'} \label{thm9:ratio_jacobian}
 \end{align}
