@@ -293,10 +293,6 @@ convex. If $f_1 = \argmin_f G(f)$, and $f_2 = \argmin_f G(f) + g(f)$, then
 \label{lemma:strong_convex_sensitivity}
 \end{lemma}
 
-\begin{proof}
-TODO(achald): Should we write out this proof?
-\end{proof}
-
 \subsubsection{Performance Guarantees}
 We establish the performance guarantees in the following notion: we compare the loss induced by the differentially-private output $f_{priv}$ with the loss induced any arbitrary classifier $f_0$. We then prove that with a sufficient number of samples, the loss induced by $f_{priv}$ is smaller or arbitrarily close to the loss induced by $f_0$. The term $\norm{f_0}$ is included in the sample complexity bound.
 \begin{theorem} Let $N(f) = \frac{1}{2}\norm{f}^2$, and let $f_0$ be any classifier. Let $L(f) = \Eb_{x, y}\; [l(f^T x, y)]$ be the true loss. Let $l$ be differentiable and continuous, and let $l'$ be $c$-Lipschitz with $\abs{l'} \le 1$. Then, there exists a constant $C$ s.t. when the number of training samples $n$ satisfies
