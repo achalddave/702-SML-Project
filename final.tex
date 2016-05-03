@@ -90,10 +90,8 @@ queries. To preserve privacy, we want the response of this mechanism
 to have a similar distribution regardless of any one individual's response.
 That is, we want that for two datasets $D, D'$ that differ in only one
 individual (denoted $D \sim D'$), the distribution of $\Mc(D)$ is close to
-$\Mc(D')$.
-
-With this notation, we can formalize $(\epsilon, \delta)$-differential
-privacy~\cite{dwork2014algorithmic} as follows:
+$\Mc(D')$. With this notation, we can formalize $(\epsilon,
+\delta)$-differential privacy~\cite{dwork2014algorithmic} as follows:
 
 \begin{definition}{(Differential Privacy)}
 A random mechanism $\Mc$ is $(\epsilon, \delta)$-differentially private
@@ -104,7 +102,12 @@ P(\Mc(D) \in \Sc) \leq \exp{(\epsilon)} P(\Mc(D') \in \Sc) + \delta
 \end{align*}
 \end{definition}
 
-A simple, intuitive way of ensuring differential privacy is to add noise to the
+Intuitively, this definition says that the probability of any given response
+being output by the mechanism doesn't change by changing an individual's
+response. If this is not the case, then the response may reveal information that
+sacrifices the privacy of an individual.
+
+A simple way to ensure differential privacy is to add noise to the
 output of queries. Suppose a query
 \[ q(D) : \Dc^n \rightarrow \mathbb{R}^k \]
 is requested. Then, instead of returning $q(D)$, we can return
