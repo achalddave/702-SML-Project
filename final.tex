@@ -361,63 +361,63 @@ We note that (1) there is an additional regularization term $\frac{1}{2}\Delta \
 
 \subsubsection{Privacy Guarantees}
 \begin{theorem}
-If $N$ is doubly differentiable and $1$-strongly convex; $L$ is convex and doubly differentiable with $\abs{L'} \le 1, \abs{L''} \le c$, then Algorithm~\ref{alg:obj_perturb} is $\epsilon$-differentially private.
+If $N$ is doubly differentiable and $1$-strongly convex; $\ell$ is convex and doubly differentiable with $\abs{\ell'} \le 1, \abs{\ell''} \le c$, then Algorithm~\ref{alg:obj_perturb} is $\epsilon$-differentially private.
 \end{theorem}
 
 \begin{proof}[Proof sketch]
 Since $J(f, D) + \frac{1}{2}\Delta \norm{f}_2^2$ is strongly-convex, we take the gradient and set it to 0:
 \begin{align}
-\del [J(f, D) +  \frac{1}{2}\Delta \norm{f}_2^2]= & \frac{1}{n}\sum_{i=1}^n \del l(f(x_i), y_i) + \frac{1}{n} b+ \lambda \del N(f) + \Delta f  \triangleq 0\nonumber\\
-b =&  -\sum_{i=1}^n \del l(f^Tx_i, y_i) -n \lambda \del N(f) - n\Delta f\nonumber\\
-= & -\sum_{i=1}^n y_i l''(y_i f^T x) x_i - n\Lambda \del N(f) - n\Delta f\label{thm9:b}
+& \del [J(f, D) +  \frac{1}{2}\Delta \norm{f}_2^2]= \frac{1}{n}\sum_{i=1}^n \del \ell(f^T x_i, y_i) + \frac{1}{n} b+ \Lambda \del N(f) + \Delta f  \triangleq 0\nonumber\\
+\Rightarrow \quad & b =  -\sum_{i=1}^n \del \ell(f^Tx_i, y_i) -n \Lambda \del N(f) - n\Delta f\nonumber\\
+& =  -\sum_{i=1}^n y_i \ell''(y_i f^T x) x_i - n\Lambda \del N(f) - n\Delta f\label{thm9:b}
 \end{align}
 
-This equation defines a mapping from any fixed $f$ to a unique $b$. On the other hand, since the objective is strongly-convex, for any fixed $b$, there exists a unique minimizer $f$. Hence, there is a bijection between $b$ and $f$.
+This equation defines a mapping from any vector $f$ to a unique $b$. On the other hand, since the objective is strongly-convex, for any fixed $b$, there exists a unique $f$. Hence, there is a bijection between $b$ and $f$.
 
-Then, we write the density ratio of the output $f_{priv}$ in terms of the density ratio of the noise $b$, using standard transformation of variables:
+Then, we write the density ratio of the output $f_{priv}$ in terms of the density ratio of the noise $b$, using transformation of variables:
 \begin{align}
 \frac{g(f_{priv} | D)}{g(f_{priv} | D')} = \frac{\mu(b | D)}{\mu(b' | D')} \cdot \frac{\abs{\det(J(f_{priv} \rightarrow b | D))}^{-1}}{\abs{\det(J(f_{priv} \rightarrow b' | D'))}^{-1}}, \label{thm9:main}
 \end{align}
 where $J$ denotes the Jacobian matrix of the mapping.
 
-From~\eqref{thm9:b}, we analytically compute and bound the Jacobian ratio:
+From~\eqref{thm9:b}, we analytically compute and bound the ratio of the Jacobian matrices:
 \begin{align*}\frac{\abs{\det(J(f_{priv} \rightarrow b | D))}^{-1}}{\abs{\det(J(f_{priv} \rightarrow b' | D'))}^{-1}} \le \left(1 + \frac{c}{n(\Lambda + \Delta)}\right)^2
 \end{align*}
 
-We want to bound this term by $e^{\epsilon_p - \epsilon_p'}$, so in the first case, we directly set $\epsilon' = \epsilon  - \log{(1 + \frac{c}{n\Lambda})^2}$, and $\Delta = 0$ if $\epsilon' > 0$. In the second case, we address when $\epsilon'$ becomes negative, and reset $\epsilon_p' = \frac{\epsilon}{2}$ and $\Delta = \frac{c}{n(e^{\frac{\epsilon_p}{4}}- 1)}- \Lambda$. We can verify that falling into the second case implies $\Delta > 0$. Hence,
+We want to bound this term by $e^{\epsilon - \epsilon'}$, so in the first case, we directly set $\epsilon' = \epsilon  - \log{(1 + \frac{c}{n\Lambda})^2}$, and $\Delta = 0$ if $\epsilon' > 0$. In the second case, we address the case when $\epsilon'$ becomes negative, and reset $\epsilon_p' = \frac{\epsilon}{2}$ and $\Delta = \frac{c}{n(e^{\frac{\epsilon}{4}}- 1)}- \Lambda$. We can verify that falling into the second case implies $\Delta > 0$. Hence,
 \begin{align}
-\frac{\abs{\det(J(f_{priv} \rightarrow b | D))}^{-1}}{\abs{\det(J(f_{priv} \rightarrow b' | D'))}^{-1}} \le e^{\epsilon_p' - \epsilon} \label{thm9:ratio_jacobian}
+\frac{\abs{\det(J(f_{priv} \rightarrow b | D))}^{-1}}{\abs{\det(J(f_{priv} \rightarrow b' | D'))}^{-1}} \le e^{\epsilon - \epsilon'} \label{thm9:ratio_jacobian}
 \end{align}
 Next, we bound the density of the ratio of the noise. From~\eqref{thm9:b}, we have
 \begin{align*}
-& b' - b = y_n l'(y_n f^T x_n) x_n - y_n' l'(y_n f^T x_n') x_n'
+& b' - b = y_n \ell'(y_n f^T x_n) x_n - y_n' \ell'(y_n f^T x_n') x_n'
 \end{align*}
 
-From the conditions that $\abs{l'} \le 1, \abs{y_i} \le 1, \norm{x_i} \le 1$,
+From the conditions $\abs{\ell'} \le 1, \abs{y_i} \le 1, \norm{x_i} \le 1$,
 \begin{align*}
 & \norm{b} - \norm{b'} \le \norm{b - b'} \le 2
 \end{align*}
 
 Then, \begin{align}
- \frac{\mu(b | D)}{\mu(b' | D')} = \frac{e^{-\frac{\epsilon_p' \norm{b}}{2}}}{e^{\frac{-\epsilon' \norm{b'}}{2}}}\le e^{\frac{\epsilon_p'(\norm{b} - \norm{b'})}{2}} \le e^{\epsilon'_p} \label{thm9:ratio_noise}
+ \frac{\mu(b | D)}{\mu(b' | D')} = \frac{e^{-\frac{\epsilon' \norm{b}}{2}}}{e^{\frac{-\epsilon' \norm{b'}}{2}}}\le e^{\frac{\epsilon'(\norm{b} - \norm{b'})}{2}} \le e^{\epsilon'} \label{thm9:ratio_noise}
 \end{align}
- Combining the two parts~\eqref{thm9:ratio_jacobian} and~\eqref{thm9:ratio_noise} in~\eqref{thm9:b} completes the proof.
+We complete the proof by plugging the two parts,~\eqref{thm9:ratio_jacobian} and~\eqref{thm9:ratio_noise}, into~\eqref{thm9:main}.
 \end{proof}
 
 \subsubsection{Performance Guarantees}
-We follow the same framework as in output perturbation to analyze objective perturbation.
+We follow the same framework and notations as in output perturbation.
 \begin{theorem}
-Let $f_0$ be any classifier. If $l$ is convex, doubly differentiable with derivative $|l'| \le 1$ and $|l''(z)| \le c$. Then, there exists a constant $C$ \emph{s.t.} when the number of training samples $n$ satifies
-$$n > C\max{\left\{ \frac{\norm{f_0}^2 \log{\frac{1}{\delta}}}{\epsilon_g^2}, \frac{c\norm{f_0}^2}{\epsilon_g \epsilon_p}, \frac{d\log{\frac{d}{\delta}} \norm{f_0}}{\epsilon_g\epsilon}\right\}},$$
+Let $f_0$ be any classifier. If $\ell$ is convex, doubly differentiable with derivative $|\ell'| \le 1$ and $|\ell''| \le c$. Then, there exists a constant $C$ s.t. when the number of training samples $n$ satisfies
+$$n > C\max{\left\{ \frac{\norm{f_0}^2 \log{\frac{1}{\delta}}}{\epsilon_g^2}, \frac{c\norm{f_0}^2}{\epsilon_g \epsilon}, \frac{d\log{\frac{d}{\delta}} \norm{f_0}}{\epsilon_g\epsilon}\right\}},$$
 the output $f_{priv}$ of Algorithm~\ref{alg:obj_perturb} satisfies $P(L(f_{priv}) \le L(f_0) + \epsilon_g) \ge 1 - 2\delta$.
 \end{theorem}
 \begin{proof}[Proof sketch]
-The proof is similar to the output perturbation case, where we decompose the loss into three terms. The analysis for $J(f_{priv}, D) - J(f^*, D)$ is different (\emph{cf.} Equation~\eqref{thm15:emp}).
+The proof is similar to the output perturbation case, where we decompose the loss into the same three terms. The analysis for $J(f_{priv}, D) - J(f^*, D)$ is different (\emph{cf.} Equation~\eqref{thm15:emp}).
 \end{proof}
 
-Objective perturbation has a better generalization bound compared to output perturbation.
+Comparing Theorem 7 and 9, objective perturbation has a better generalization bound compared to output perturbation.
 
-TODO: compare the sample complexity for the two methods in word
+% TODO: compare the sample complexity for the two methods in word
 
 \section{Parameter Tuning}
 The above methods assumed that we were provided with a fixed value of $\Lambda$,
