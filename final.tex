@@ -45,22 +45,33 @@ Jingyan Wang \\
 
 
 \section{Introduction}
-The growth of the Internet and electronic databases has led to an
-increasing concern about the privacy of user information. These databases
-facilitate researchers to analyze patterns from large groups of people and develop machine learning algorithms, such as
-identifying trends or recommending movies. Although increasingly useful, these methods come at the cost
-of user privacy: as we ask questions about a large dataset of users'
-information, we receive information of not only the group, but also of
-individual users. Prior work has theoretically~\cite{ganta2008composition} and empirically~\cite{sweeney1997weaving} demonstrated that even anonymous datasets can reveal
-sensitive details about individuals. For example, \cite{narayanan2008robust} has shown that individual subscribers in the Netflix Prize dataset can be accurately identified with a minimal amount of auxiliary public information. 
+The growth of the Internet and electronic databases has led to an increasing
+concern about the privacy of user information. These databases facilitate
+researchers to analyze patterns from large groups of people and develop machine
+learning algorithms, such as identifying trends or recommending movies. Although
+increasingly useful, these methods come at the cost of user privacy: as we ask
+questions about a large dataset of users' information, we receive information of
+not only the group, but also of individual users. Prior work has
+theoretically~\cite{ganta2008composition} and
+empirically~\cite{sweeney1997weaving} demonstrated that even anonymous datasets
+can reveal sensitive details about individuals. For example,
+\cite{narayanan2008robust} has shown that individual subscribers in the Netflix
+Prize dataset can be accurately identified with a minimal amount of auxiliary
+public information.
 
-Differential privacy offers a formal paradigm which guarantees provable privacy for users, while allowing
-queries that reveal aggregated statistics about the dataset as a whole. Revisiting machine learning problems with this notation of differential privacy has been giving rise to lots of new algorithms and theoretical guarantees.
+Differential privacy offers a formal paradigm which guarantees provable privacy
+for users, while allowing queries that reveal aggregated statistics about the
+dataset as a whole. Revisiting machine learning problems with this notation of
+differential privacy has recently given rise to a number of new algorithms and
+theoretical guarantees.
 
-We survey the prior works on differential privacy, with an emphasis on empirical risk minimization (ERM). Section~\ref{overview} introduces the fundamental concepts and basic properties. Section~\ref{section:erm} discusses two algorithms for empirical risk minimization and considers the tradeoffs between privacy guarantees and generalization performance. The parameter tuning technique and specific examples of ERM (\emph{e.g.} logistic regression, SVM) are also discussed.
-
-% Reading List
-% A survey of differential privacy results. \cite{dwork2008differential}
+We survey the prior works on differential privacy, with an emphasis on empirical
+risk minimization (ERM). \Cref{overview} introduces the fundamental
+concepts and basic properties. \Cref{section:erm} discusses two
+algorithms for empirical risk minimization and considers the tradeoffs between
+privacy guarantees and generalization performance. The parameter tuning
+technique and specific examples of ERM (\emph{e.g.} logistic regression, SVM)
+are also discussed.
 
 \section{Overview}\label{overview}
 The notion of differential privacy~\cite{dwork2006calibrating} was first developed by Dwork \emph{et al} as follows.
