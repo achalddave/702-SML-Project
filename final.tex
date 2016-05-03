@@ -139,7 +139,7 @@ the utility of the response. In this case, we can instead consider the
 exponential mechanism, which allows specifying a utility function for responses.
 
 Define a utility function $u : \Nb^{\abs{\Xc}} \times \Rc \rightarrow \Rb$,
-which assings a utility to a response for a given database. Similar to the
+which assigns a utility to a response for a given database. Similar to the
 sensitivity of $f$, let's define the sensitivity of $u$:
 \begin{align*}
 \Delta u \triangleq \max_{r \in \Rc} \max_{x, y : \norm{x - y}_1 \leq 1} \abs{u(x, r) - u(y, r)}
@@ -264,7 +264,7 @@ proof.
 
 \begin{lemma}
 Let $G(f)$ and $g(f)$ be continuous vector-valued functions which are
-differentialbe at all points. Let $G(f)$ and $G(f) + g(f)$ be $\lambda-$strongly
+differentiable at all points. Let $G(f)$ and $G(f) + g(f)$ be $\lambda-$strongly
 convex. If $f_1 = \argmin_f G(f)$, and $f_2 = \argmin_f G(f) + g(f)$, then
 \begin{align*}
 \norm{f_1 - f_2} \leq \frac{1}{\lambda} \max_f \norm{\nabla g(f)}
@@ -278,7 +278,7 @@ TODO(achald): Should we write out this proof?
 
 \subsubsection{Performance Guarantees}
 To analyze the performance guarantees, we compare the loss induced by the output $f_{priv}$ of the algorithm with the loss induced any arbitrary classifier $f_0$. The norm of $f_0$ is included in the sample complexity bound.
-\begin{theorem} Let $f_0$ be any classifier. Let $L$ be the true loss. If $l$ is differentiable and continuous with $c$-Lipschitz derivative $l'$ with $\abs{l'} \le 1$. Then, there exists a constant $C$ \emph{s.t.} when the number of training samples $n$ satifies
+\begin{theorem} Let $f_0$ be any classifier. Let $L$ be the true loss. If $l$ is differentiable and continuous with $c$-Lipschitz derivative $l'$ with $\abs{l'} \le 1$. Then, there exists a constant $C$ \emph{s.t.} when the number of training samples $n$ satisfies
 $$n > C\max{\left\{\frac{\norm{f_0}^2 \log{\frac{1}{\delta}}}{\epsilon_g^2}, \frac{d\log{\frac{d}{\delta}}\norm{f_0}^2}{\epsilon_g \epsilon}, \frac{d\log{\frac{d}{\delta}}\sqrt{c} \norm{f_0}^2}{\epsilon_g^{\frac{3}{2}}\epsilon}\right\}},$$
 
 the output $f_{priv}$ of Algorithm~\ref{alg:output_perturb} satisfies $P(L(f_{priv}) \le L(f_0) + \epsilon_g) \ge 1 - 2\delta$.
@@ -405,20 +405,10 @@ the regularization parameter. In practice, however, it is common to perform a
 sweep over a set of values of $\Lambda$. Usually, we can do this by training
 models with multiple values of $\Lambda$, and evaluating them on a hold-out
 validation set and choosing the value that performs best on the hold-out set.
-However, the following theorem from \cite{dwork2014algorithmic} shows that doing
-so is not differentially private:
-
-\begin{theorem}
-Let $\Mc_1$ be an $\epsilon_1$-differentially private algorithm, and let $\Mc_2$
-be an $\epsilon_2$ differentially private algorithm. Then their combination,
-$\Mc_{1,2}(x) = (\Mc_1(x), \Mc_2(x))$ is $\epsilon_1 + \epsilon_2$
-differentially private.
-\end{theorem}
-
-Thus, running the differentially private ERM algorithms from above for $m$
-different $\Lambda$ values would render the result only
-$(m \epsilon)$-differentially private. So, we need an end to end differentially
-private method for choosing $\Lambda$.
+However, this requires running the algorithm multiple times on the same dataset,
+which can compromise differential privacy by revealing a relationship between
+$\Lambda$ and the output. Instead, we need an end to end differentially private
+method for choosing $\Lambda$.
 
 One simple option to fix this problem is to tune $\Lambda$ on a public dataset
 where privacy is not of concern. Then, using this tuned $\Lambda$, we can use
@@ -492,7 +482,61 @@ In this section, we briefly give examples on how standard learning algorithms fi
 		For example, the Huber loss is only piecewise doubly differentiable. We slightly modify the proofs by arguing that the set in which the function is not differentiable has measure $0$, and hence does not affect the density ratio in the definition of differential privacy.
 	\end{enumerate}
 
-\section{Conclusion}
+\section{Discussions and Conclusion}
+
+We have discussed the definition of differential privacy as well as a couple of
+ways to ensure differential privacy for general queries. Further, we showed the
+applications of these mechanisms for Empirical Risk Minimization, so that we
+are able to train classifiers on datasets in a differentially private manner.
+As we look further into providing privacy in the real world, we must consider
+additional challenges as well as alternative definitions of privacy.
+
+\textbf{Local Differential Privacy.} So far, we have considered differential
+privacy where a trusted authority has access to the true dataset. This authority
+can then receive a query, run a differentially private algorithm on the dataset,
+and provide some perturbed result of the query to the statistician. In the real
+world, however, individuals may be unwilling to sacrifice their privacy to
+\textit{any} trusted authority. How can an authority receive some information
+from individuals that maintains their privacy from the authority? This is a
+stronger claim than differential privacy -- intuitively, if the data is private
+from the authority, the authority cannot provide any more privacy sacrificing
+information to a statistician who queries the dataset. \cite{duchi2013local}
+discuss this setting of \textit{local} differential privacy, and, critically,
+show that for many statistical procedures, the effective sample size under
+$\alpha$-local differential privacy with $n$ data points in $d$ dimensions is
+reduced to $n \alpha^2 / d$. This reduction can lead to drastically poor
+estimation results, and shows that providing local differential privacy can be
+very costly in terms of the accuracy of query results.
+
+\textbf{Implementation Challenges.} We have seen algorithms that provide
+strong theoretical guarantees on both the privacy afforded to the individuals in
+a dataset as well and on the accuracy of the output. A number of packages have
+been implemented that expose the Laplace mechanism for end users, such as
+Airavat \cite{mohan2012gupt} and GUPT \cite{roy2010airavat}. In practice,
+however, implementation challenges can sacrifice privacy despite theoretical
+guarantees. For example, the details of the floating point standard can cause
+severe issues in privacy guarantees. In particular, the non-uniform spacing of
+the doubles causes issues in the support of the perturbed output values of the
+Laplace mechanism - the algorithm's output may have support on certain values
+when run on one dataset, but not on another dataset, violating differential
+privacy.  \cite{mironov2012significance} describes this issue, and shows that it
+is possible to consistently violate privacy using current implementations of
+Laplace mechanisms, and shows how to overcome these challenges.
+
+\textbf{Conclusion.} Despite these challenges facing privacy, it is possible to
+provide strong theoretical guarantees in the case of standard differential
+privacy for both privacy and performance. This survey, in addition to providing
+an overview of differential privacy, discusses methods for performing empirical
+risk minimization while maintaining privacy. It remains unclear whether these
+methods are optimal, and minimax rates for ERM under differential privacy remain
+elusive. However, the methods discussed here show that it is possible to perform
+private ERM without significantly sacrificing performance, and suggests that
+differential privacy in conjunction with other machine learning problems can
+provide a useful trade-off between privacy and utility. Further work in
+combining machine learning algorithms with differential privacy will hopefully
+alleviate this issue, making it easier for dataset owners (such as companies) to
+share useful information about populations with outside groups while maintaining
+privacy.
 
 {\small
 \bibliographystyle{plain}
