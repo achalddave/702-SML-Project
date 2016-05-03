@@ -299,7 +299,7 @@ TODO(achald): Should we write out this proof?
 
 \subsubsection{Performance Guarantees}
 We establish the performance guarantees in the following notion: we compare the loss induced by the differentially-private output $f_{priv}$ with the loss induced any arbitrary classifier $f_0$. We then prove that with a sufficient number of samples, the loss induced by $f_{priv}$ is smaller or arbitrarily close to the loss induced by $f_0$. The term $\norm{f_0}$ is included in the sample complexity bound.
-\begin{theorem} Let $f_0$ be any classifier. Let $L(f) = \Eb_{x, y}\; [l(f^T x, y)]$ be the true loss. Let $l$ be differentiable and continuous, and let $l'$ be $c$-Lipschitz with $\abs{l'} \le 1$. Then, there exists a constant $C$ s.t. when the number of training samples $n$ satisfies
+\begin{theorem} Let $N(f) = \frac{1}{2}\norm{f}^2$, and let $f_0$ be any classifier. Let $L(f) = \Eb_{x, y}\; [l(f^T x, y)]$ be the true loss. Let $l$ be differentiable and continuous, and let $l'$ be $c$-Lipschitz with $\abs{l'} \le 1$. Then, there exists a constant $C$ s.t. when the number of training samples $n$ satisfies
 $$n > C\max{\left\{\frac{\norm{f_0}^2 \log{\frac{1}{\delta}}}{\epsilon_g^2}, \frac{d\log{\frac{d}{\delta}}\norm{f_0}^2}{\epsilon_g \epsilon}, \frac{d\log{\frac{d}{\delta}}\sqrt{c} \norm{f_0}^2}{\epsilon_g^{\frac{3}{2}}\epsilon}\right\}},$$
 
 the output $f_{priv}$ of Algorithm~\ref{alg:output_perturb} satisfies $\Pb(L(f_{priv}) \le L(f_0) + \epsilon_g) \ge 1 - 2\delta$.
@@ -307,30 +307,30 @@ the output $f_{priv}$ of Algorithm~\ref{alg:output_perturb} satisfies $\Pb(L(f_{
 
 \begin{proof}[Proof sketch]
 Let $\overline{J}(f) = L(f) + \frac{\Lambda}{2} \norm{f}^2$, and let \begin{align*}
-f_{rtr} = \argmin_f \overline{J}(f)\\
-f^* = \argmin_f J(f, D)
+& f_{rtr} = \argmin_f \overline{J}(f)\\
+& f^* = \argmin_f J(f, D)
 \end{align*}
 
-We decompose the loss as follows:
+We decompose the loss as follows and bound the terms separately:
 \begin{align*}
 L(f_{priv}) -  L(f_0) = [\overline{J}(f_{priv}) - \overline{J}(f_{rtr})] + \left[\overline{J}(f_{rtr}) - \overline{J}(f_0)\right] + \frac{\Lambda}{2} \norm{f_0}^2 - \frac{\Lambda}{2} \norm{f_{priv}}^2
 \end{align*}
 
-For the first term, we first bound the difference between the objective of $f_*$ and that of the differentially-private solution $f_{priv}$:
+For the first term, we first bound the difference between the (empirical) objective of $f_*$ and that of the differentially-private solution $f_{priv}$, by the conditions $\norm{x_i} \le 1, \abs{y_i} \le 1$:
 \begin{align}
 J(f_{priv}, D) - J(f^*, D) \le \frac{8d^2\log^2{(\frac{d}{\delta})} (c + \Lambda)}{\Lambda^2 n^2 \epsilon_p^2}.\label{thm15:emp}
 \end{align}
 
-Then, applying Theorem 1 of~\cite{sridharan2008objective}, we have
+Then, we apply Theorem 1 of~\cite{sridharan2008objective} and have:
 \begin{align*}
 \overline{J}(f_{priv}) - \overline{J}(f_{rtr}) & \le 2 [J(f_{priv}, D) - J(f^*, D)] + O(\frac{\log{(\frac{1}{\delta})}}{\Lambda n})\\
 & \le  \frac{16d^2\log^2{(\frac{d}{\delta})} (c + \Lambda)}{\Lambda^2 n^2 \epsilon_p^2} + O(\frac{\log{(\frac{1}{\delta})}}{\Lambda n})
 \end{align*}
-The second term $\overline{J}(f_{rtr}) - \overline{J}(f_0) \le 0$.
+For the second term, by definition of $f_{rtr}$, we have $\overline{J}(f_{rtr}) - \overline{J}(f_0) \le 0$.
 
-Setting $\Lambda = \frac{\epsilon_g}{\norm{f_0}^2}$, we obtain
+Setting $\Lambda = \frac{\epsilon_g}{\norm{f_0}^2}$ in the three terms, we obtain:
 \begin{align*}
-L(f_{priv}) - L(f_0) \le  \frac{16d^2\log^2{(\frac{d}{\delta})} (c + \Lambda)}{\Lambda^2 n^2 \epsilon_p^2} + O(\frac{\log{(\frac{1}{\delta})}}{\Lambda n}) + \frac{\epsilon_g}{2}.
+L(f_{priv}) - L(f_0) \le  \frac{16\norm{f_0}^4 d^2\log^2{(\frac{d}{\delta})} (c +\frac{\epsilon_g}{\norm{f_0}^2})}{n^2 \epsilon_g^2\epsilon_p^2} + O(\norm{f_0}^2\frac{\log{(\frac{1}{\delta})}}{n\epsilon_g}) + \frac{\epsilon_g}{2}.
 \end{align*}
 
 Equating the RHS with $\epsilon_g$ and solving for $n$ complete the proof.
@@ -341,8 +341,8 @@ Alternative to perturbing the solution of the algorithm, we can also perturb the
 
 \begin{algorithm}[htb]
 \begin{algorithmic}[1]
-  \Function{Objective Perturbation}{$D, \epsilon, \lambda$}
-    \State Set $\epsilon' = \epsilon - \log{(1 + \frac{2c}{n\lambda} + \frac{c^2}{n\lambda^2})}$.
+  \Function{Objective Perturbation}{dataset $D$, differential privacy $\epsilon$, regularization $\Lambda$}
+    \State Set $\epsilon' = \epsilon - \log{(1 + \frac{2c}{n\Lambda} + \frac{c^2}{n\Lambda^2})}$.
     \If{$\epsilon' > 0$}
 	\State $\Delta = 0$.
     \Else
@@ -356,10 +356,8 @@ Alternative to perturbing the solution of the algorithm, we can also perturb the
 \caption{Objective perturbation}\label{alg:obj_perturb}
 \end{algorithm}
 
-We note that \begin{enumerate*}[label=(\roman*)]
-\item There is an additional regularization term $\frac{1}{2}\Delta \norm{f}_2^2$.
-\item A slack of $\log{(1 + \frac{2c}{n} + \frac{c^2}{n^2\lambda^2})}$ is introduced. When proving $\epsilon$-differential privacy, we split the density ratio into two factors, and bound them respectively with $e^{\epsilon'}$ and $e^{\epsilon - \epsilon'}$. The two cases are needed to ensure that $\epsilon' > 0$.
-\end{enumerate*}
+We note that (1) there is an additional regularization term $\frac{1}{2}\Delta \norm{f}_2^2$, and that
+(2) a slack of $\log{(1 + \frac{2c}{n\Lambda} + \frac{c^2}{n^2\Lambda^2})}$ is introduced. When proving $\epsilon$-differential privacy, we split the density ratio into two factors, and bound them respectively with $e^{\epsilon'}$ and $e^{\epsilon - \epsilon'}$. The two cases in Line 3-7 are needed to ensure that $\epsilon' > 0$.
 
 \subsubsection{Privacy Guarantees}
 \begin{theorem}
