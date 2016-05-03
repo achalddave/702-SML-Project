@@ -77,8 +77,8 @@ new theoretical guarantees.
 
 In this project, we survey the fundamental concepts about differential privacy,
 and discuss approaches for performing empirical risk minimization while
-maintaining privacy, and consider the tradeoffs between the algorithms as well
-as the tradeoffs between performance and privacy.
+maintaining privacy, and consider the trade-offs between the algorithms as well
+as the trade-offs between performance and privacy.
 
 % Reading List
 % Some broad motivation for the need for differential privacy. \cite{narayanan2008robust}
@@ -154,7 +154,7 @@ the utility of the response. In this case, we can instead consider the
 exponential mechanism, which allows specifying a utility function for responses.
 
 Define a utility function $u : \Nb^{\abs{\Xc}} \times \Rc \rightarrow \Rb$,
-which assings a utility to a response for a given database. Similar to the
+which assigns a utility to a response for a given database. Similar to the
 sensitivity of $f$, let's define the sensitivity of $u$:
 \begin{align*}
 \Delta u \triangleq \max_{r \in \Rc} \max_{x, y : \norm{x - y}_1 \leq 1} \abs{u(x, r) - u(y, r)}
@@ -279,7 +279,7 @@ proof.
 
 \begin{lemma}
 Let $G(f)$ and $g(f)$ be continuous vector-valued functions which are
-differentialbe at all points. Let $G(f)$ and $G(f) + g(f)$ be $\lambda-$strongly
+differentiable at all points. Let $G(f)$ and $G(f) + g(f)$ be $\lambda-$strongly
 convex. If $f_1 = \argmin_f G(f)$, and $f_2 = \argmin_f G(f) + g(f)$, then
 \begin{align*}
 \norm{f_1 - f_2} \leq \frac{1}{\lambda} \max_f \norm{\nabla g(f)}
@@ -293,7 +293,7 @@ TODO(achald): Should we write out this proof?
 
 \subsubsection{Performance Guarantees}
 To analyze the performance guarantees, we compare the loss induced by the output $f_{priv}$ of the algorithm with the loss induced any arbitrary classifier $f_0$. The norm of $f_0$ is included in the sample complexity bound.
-\begin{theorem} Let $f_0$ be any classifier. Let $L$ be the true loss. If $l$ is differentiable and continuous with $c$-Lipschitz derivative $l'$ with $\abs{l'} \le 1$. Then, there exists a constant $C$ \emph{s.t.} when the number of training samples $n$ satifies
+\begin{theorem} Let $f_0$ be any classifier. Let $L$ be the true loss. If $l$ is differentiable and continuous with $c$-Lipschitz derivative $l'$ with $\abs{l'} \le 1$. Then, there exists a constant $C$ \emph{s.t.} when the number of training samples $n$ satisfies
 $$n > C\max{\left\{\frac{\norm{f_0}^2 \log{\frac{1}{\delta}}}{\epsilon_g^2}, \frac{d\log{\frac{d}{\delta}}\norm{f_0}^2}{\epsilon_g \epsilon}, \frac{d\log{\frac{d}{\delta}}\sqrt{c} \norm{f_0}^2}{\epsilon_g^{\frac{3}{2}}\epsilon}\right\}},$$
 
 the output $f_{priv}$ of Algorithm~\ref{alg:output_perturb} satisfies $P(L(f_{priv}) \le L(f_0) + \epsilon_g) \ge 1 - 2\delta$.
