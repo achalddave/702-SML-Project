@@ -479,19 +479,21 @@ In this section, we briefly give examples on how standard learning algorithms fi
 \subsection{Logistic Regression}
 In regularized logistic regression, we have
 \begin{align*}
-& N(f) = \frac{1}{2} \norm{f}^2\\
-& l(z) = \log{(1 + e^{-z})}
+\ell(y f^T x) = \log{(1 + e^{-y f^T x})} ~;~ N(f) = \frac{1}{2} \norm{f}^2
 \end{align*}
 
-$l$ is continuous and doubly differentiable with $c = \frac{1}{4}$.
+Here, $\ell$ is continuous and doubly differentiable with $c = \frac{1}{4}$, so
+we can directly use the private algorithms described above, and the theoretical
+guarantees on their performance will hold.
+
 \subsection{SVM}
 In $L_2$-regularized support vector machines,
 \begin{align*}
-& N(f) = \frac{1}{2} \norm{f}^2\\
-& l(z) = \max{(0, 1 - z)}
+\ell(y f^T x) = \max{(0, 1 - y f^T x)} ~;~ N(f) = \frac{1}{2} \norm{f}^2
 \end{align*}
 
-This loss function is not differentiable. There are two ways to address the issue:
+Unfortunately, this loss function is not differentiable. There are two ways we
+can address the issue:
 \begin{enumerate}[label=(\roman*)]
     \item Use a doubly differentiable surrogate function.
     \item Use a differentiable surrogate function.
