@@ -497,23 +497,61 @@ In this section, we briefly give examples on how standard learning algorithms fi
 		For example, the Huber loss is only piecewise doubly differentiable. We slightly modify the proofs by arguing that the set in which the function is not differentiable has measure $0$, and hence does not affect the density ratio in the definition of differential privacy.
 	\end{enumerate}
 
-\section{Implementation Challenges}
-So far, we have seen algorithms that provide strong theoretical guarantees on
-both the privacy afforded to the individuals in a dataset as well and on the
-accuracy of the output. A number of packages have been implemented that expose
-the Laplace mechanism for end users, such as Airavat
-\cite{mohan2012gupt} and GUPT \cite{roy2010airavat}.
+\section{Discussions and Conclusion}
 
-In practice, however, the details of the floating point standard can cause
+We have discussed the definition of differential privacy as well as a couple of
+ways to ensure differential privacy for general queries. Further, we showed the
+applications of these mechanisms for Empirical Risk Minimization, so that we
+are able to train classifiers on datasets in a differentially private manner.
+As we look further into providing privacy in the real world, we must consider
+additional challenges as well as alternative definitions of privacy.
+
+\textbf{Local Differential Privacy.} So far, we have considered differential
+privacy where a trusted authority has access to the true dataset. This authority
+can then receive a query, run a differentially private algorithm on the dataset,
+and provide some perturbed result of the query to the statistician. In the real
+world, however, individuals may be unwilling to sacrifice their privacy to
+\textit{any} trusted authority. How can an authority receive some information
+from individuals that maintains their privacy from the authority? This is a
+stronger claim than differential privacy -- intuitively, if the data is private
+from the authority, the authority cannot provide any more privacy sacrificing
+information to a statistician who queries the dataset. \cite{duchi2013local}
+discuss this setting of \textit{local} differential privacy, and, critically,
+show that for many statistical procedures, the effective sample size under
+$\alpha$-local differential privacy with $n$ data points in $d$ dimensions is
+reduced to $n \alpha^2 / d$. This reduction can lead to drastically poor
+estimation results, and shows that providing local differential privacy can be
+very costly in terms of the accuracy of query results.
+
+\textbf{Implementation Challenges.} We have seen algorithms that provide
+strong theoretical guarantees on both the privacy afforded to the individuals in
+a dataset as well and on the accuracy of the output. A number of packages have
+been implemented that expose the Laplace mechanism for end users, such as
+Airavat \cite{mohan2012gupt} and GUPT \cite{roy2010airavat}. In practice,
+however, implementation challenges can sacrifice privacy despite theoretical
+guarantees. For example, the details of the floating point standard can cause
 severe issues in privacy guarantees. In particular, the non-uniform spacing of
 the doubles causes issues in the support of the perturbed output values of the
 Laplace mechanism - the algorithm's output may have support on certain values
 when run on one dataset, but not on another dataset, violating differential
-privacy. \cite{mironov2012significance} describes this issue, and shows that it
+privacy.  \cite{mironov2012significance} describes this issue, and shows that it
 is possible to consistently violate privacy using current implementations of
 Laplace mechanisms, and shows how to overcome these challenges.
 
-\section{Conclusion}
+\textbf{Conclusion.} Despite these challenges facing privacy, it is possible to
+provide strong theoretical guarantees in the case of standard differential
+privacy for both privacy and performance. This survey, in addition to providing
+an overview of differential privacy, discusses methods for performing empirical
+risk minimization while maintaining privacy. It remains unclear whether these
+methods are optimal, and minimax rates for ERM under differential privacy remain
+elusive. However, the methods discussed here show that it is possible to perform
+private ERM without significantly sacrificing performance, and suggests that
+differential privacy in conjunction with other machine learning problems can
+provide a useful trade-off between privacy and utility. Further work in
+combining machine learning algorithms with differential privacy will hopefully
+alleviate this issue, making it easier for dataset owners (such as companies) to
+share useful information about populations with outside groups while maintaining
+privacy.
 
 {\small
 \bibliographystyle{plain}
